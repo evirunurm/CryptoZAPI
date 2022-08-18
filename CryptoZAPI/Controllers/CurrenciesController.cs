@@ -8,7 +8,6 @@ namespace CryptoZAPI.Controllers
     [ApiController]
     public class CurrenciesController : ControllerBase
     {
-
         // Logging
         private readonly ILogger<CurrenciesController> _logger;
 
@@ -17,24 +16,25 @@ namespace CryptoZAPI.Controllers
             _logger = logger;
         }
 
-         // GET
+        // GetAll
+        // FindOne
+        // Put
+
+
+
+        // GET
         [HttpGet(Name = "GetCurrencies")]
         public IEnumerable<Currency> Get()
         {
             return new List<Currency>();
         }
 
-         //[HttpGet(Name = "GetCurrency")]
-        // public Currency Get(int id)
-         //{
-         //    return null;
-         //}
-
          // PUT
         [HttpPut(Name = "PutCurrencies")]
-        public Currency Get(int id, string newName)
+        public Currency Put(int id, [FromBody] Currency c)
         {
-            return null;
+            // hara cosas
+            return c;
         }
     }
 }

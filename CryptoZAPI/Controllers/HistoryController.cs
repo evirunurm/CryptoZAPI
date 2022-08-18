@@ -17,6 +17,10 @@ namespace CryptoZAPI.Controllers
             _logger = logger;
         }
 
+        // GetAll per user + last x number
+        // Post 
+
+
         // GET
         [HttpGet(Name = "GetHistories")]
         public IEnumerable<History> GetAll(int idUser)
@@ -25,17 +29,11 @@ namespace CryptoZAPI.Controllers
             return new List<History>();
         }
 
-        // [HttpGet(Name = "GetHistory")]
-        // public History Get(int id)
-         //{
-          //   return null;
-         //}
-
         // POST
         [HttpPost(Name = "PostHistory")]
-        public History Post(History history)
+        public History Post([FromBody] History history)
         {
-            return null;
+            return history;
         }
 
     }
