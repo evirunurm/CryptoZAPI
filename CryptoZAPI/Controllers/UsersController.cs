@@ -22,8 +22,8 @@ namespace CryptoZAPI.Controllers
         // FindOne
 
 
-        //POST
-        [HttpPost(Name = "PostUser")]
+        // POST users
+        [HttpPost]
         public User Post([FromBody] User user)
         {
             // Save in DB
@@ -31,9 +31,8 @@ namespace CryptoZAPI.Controllers
         }
 
 
-        // PUT
-        // [Route("users/{id}")]
-        [HttpPut(Name = "PutUser")]
+        // PUT users/5
+        [HttpPut("{id}")]
         public User Put(int id, [FromBody] User newUser)
         {
             // hara cosas
@@ -42,15 +41,12 @@ namespace CryptoZAPI.Controllers
 
 
         // GET
-        [HttpGet(Name = "GetUser")]
+        [HttpGet("{id}")]
         public User Get(int id)
         {
             // hara cosas
             return new User { Id = Guid.NewGuid(), Email = null, Name = null, Password = null, Salt = null };
         }
-
-
-
 
     }
 }

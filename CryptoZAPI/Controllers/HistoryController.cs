@@ -22,7 +22,7 @@ namespace CryptoZAPI.Controllers
 
 
         // GET
-        [HttpGet(Name = "GetHistories")]
+        [HttpGet("{idUser}")]
         public IEnumerable<History> GetAll(int idUser)
         {
             // Find History for a user
@@ -30,7 +30,7 @@ namespace CryptoZAPI.Controllers
         }
 
         // POST
-        [HttpPost(Name = "PostHistory")]
+        [HttpPost]
         public History Post([FromBody] History history)
         {
             return history;

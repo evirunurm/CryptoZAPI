@@ -20,17 +20,15 @@ namespace CryptoZAPI.Controllers
         // FindOne
         // Put
 
-
-
         // GET
-        [HttpGet(Name = "GetCurrencies")]
-        public IEnumerable<Currency> Get()
+        [HttpGet]
+        public IEnumerable<Currency> GetAll()
         {
             return new List<Currency>();
         }
 
          // PUT
-        [HttpPut(Name = "PutCurrencies")]
+        [HttpPut("{id}")]
         public Currency Put(int id, [FromBody] Currency c)
         {
             // hara cosas
