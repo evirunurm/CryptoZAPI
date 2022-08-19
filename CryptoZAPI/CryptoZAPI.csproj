@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NomixServices\NomixServices.csproj" />
+    <ProjectReference Include="..\Repository\Repository.csproj" />
   </ItemGroup>
 
 </Project>

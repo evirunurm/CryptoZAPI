@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Repository;
 
 namespace CryptoZAPI.Controllers
 {
@@ -10,19 +11,31 @@ namespace CryptoZAPI.Controllers
     {
         // Logging
         private readonly ILogger<UsersController> _logger;
+        private readonly IRepository repository;
 
-        public UsersController(ILogger<UsersController> logger)
+        public UsersController(ILogger<UsersController> logger, IRepository repository)
         {
             _logger = logger;
+            this.repository = repository;
         }
 
         // POST users
         [HttpPost]
-        public User Post([FromBody] User user)
+        public User? Post([FromBody] User user)
         {
-            // Convert user.password to Hash + salt
-            // Add user.Salt
-            // Save in Users table.
+            // TODO: Convert user.password to Hash + salt
+            // TODO: Add user.Salt
+            try
+            {
+                repository.CreateUser(user);
+                // TODO: Send a code 
+            }
+            catch (Exception e) // TODO: Change Exception type
+            {
+                // TODO: Send a code 
+                Console.WriteLine(e.Message);
+                return null;
+            }
 
             return user;
         }
@@ -30,9 +43,19 @@ namespace CryptoZAPI.Controllers
 
         // PUT users/5
         [HttpPut("{id}")]
-        public User Put(int id, [FromBody] User newUser)
+        public User? Put(int id, [FromBody] User newUser)
         {
-            // hara cosas
+            try
+            {
+                repository.ModifyUser(id, newUser);
+                // TODO: Send a code 
+            }
+            catch (Exception e) // TODO: Change Exception type
+            {
+                // TODO: Send a code 
+                Console.WriteLine(e.Message);
+                return null;
+            }
             return newUser;
         }
 
@@ -41,18 +64,17 @@ namespace CryptoZAPI.Controllers
         [HttpGet("{id}")]
         public User? FindOne(int id)
         {
-            // Cargar
-            List<User> Users = new List<User>();
-            User? user = null;
-
+            User? user;
             try
             {
-                user = Users.First(user => user.Id.Equals(id));
+                user = repository.GetOneUser(id);
+                // TODO: Send a code 
             }
-            catch (ArgumentNullException e)
+            catch (Exception e) // TODO: Change Exception type
             {
                 // Send a code 
                 Console.WriteLine(e.Message);
+                return null;
             }
 
             return user;
