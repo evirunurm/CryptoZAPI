@@ -23,4 +23,8 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NomixServices\NomixServices.csproj" />
+  </ItemGroup>
+
 </Project>

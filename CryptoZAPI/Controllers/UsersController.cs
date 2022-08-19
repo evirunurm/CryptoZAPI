@@ -16,17 +16,14 @@ namespace CryptoZAPI.Controllers
             _logger = logger;
         }
 
-
-        // Post
-        // Put
-        // FindOne
-
-
         // POST users
         [HttpPost]
         public User Post([FromBody] User user)
         {
-            // Save in DB
+            // Convert user.password to Hash + salt
+            // Add user.Salt
+            // Save in Users table.
+
             return user;
         }
 
@@ -42,10 +39,23 @@ namespace CryptoZAPI.Controllers
 
         // GET
         [HttpGet("{id}")]
-        public User Get(int id)
+        public User? FindOne(int id)
         {
-            // hara cosas
-            return new User(null, null, null, null);
+            // Cargar
+            List<User> Users = new List<User>();
+            User? user = null;
+
+            try
+            {
+                user = Users.First(user => user.Id.Equals(id));
+            }
+            catch (ArgumentNullException e)
+            {
+                // Send a code 
+                Console.WriteLine(e.Message);
+            }
+
+            return user;
         }
 
     }

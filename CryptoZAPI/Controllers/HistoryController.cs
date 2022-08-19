@@ -17,15 +17,11 @@ namespace CryptoZAPI.Controllers
             _logger = logger;
         }
 
-        // GetAll per user + last x number
-        // Post 
-
-
         // GET
         [HttpGet("{idUser}")]
         public IEnumerable<History> GetAll(int idUser, int limit)
         {
-            // Find History for a user, with limit
+            // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
             return new List<History>();
         }
 
@@ -33,6 +29,7 @@ namespace CryptoZAPI.Controllers
         [HttpPost]
         public History Post([FromBody] History history)
         {
+            // Add history to Histories table in database
             return history;
         }
 

@@ -9,10 +9,13 @@ namespace CryptoZAPI.Models
 	public class History
 	{
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public int Id { get; set; }
         [Index(0)]
         [Name("origin")]
 		public string Origin { get; set; }
+        [Index(5)]
+        [Name("userId")]
+        public int UserId { get; set; }
         [Index(1)]
         [Name("destination")]
 		public string Destination { get; set; }
@@ -26,13 +29,15 @@ namespace CryptoZAPI.Models
 		[Name("date")]
 		public DateTime Date { get; set; }
 
-		public History(string origin, string destination, double value, double result, DateTime date)
-		{
-			Origin = origin;
-			Destination = destination;
-			Value = value;
-			Result = result;
-			Date = date;
-		}
-	}
+		public History(int id, string origin, string destination, double value, double result, DateTime date, int userId)
+        {
+            Id = id;
+            Origin = origin;
+            Destination = destination;
+            Value = value;
+            Result = result;
+            Date = date;
+            UserId = userId;
+        }
+    }
 }

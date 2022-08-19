@@ -10,6 +10,7 @@ namespace CryptoZAPI.Models
         [Key]
         public int Id { get; set; }
         [Required]
+        // [Index(IsUnique=true)]
         public string Code { get; set; }
         [Required]
         [MaxLength(25)]
