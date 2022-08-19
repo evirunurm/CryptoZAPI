@@ -45,7 +45,7 @@ namespace CryptoZAPI.Controllers
         public User Get(int id)
         {
             // hara cosas
-            return new User { Id = Guid.NewGuid(), Email = null, Name = null, Password = null, Salt = null };
+            return new User(null, null, null, null);
         }
 
     }

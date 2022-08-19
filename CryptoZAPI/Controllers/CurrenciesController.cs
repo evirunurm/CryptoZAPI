@@ -16,10 +16,6 @@ namespace CryptoZAPI.Controllers
             _logger = logger;
         }
 
-        // GetAll
-        // FindOne
-        // Put
-
         // GET
         [HttpGet]
         public IEnumerable<Currency> GetAll()
@@ -27,7 +23,14 @@ namespace CryptoZAPI.Controllers
             return new List<Currency>();
         }
 
-         // PUT
+
+        [HttpGet("{id}")]
+        public Currency FindOne(int id)
+        {
+            return null;
+        }
+
+        // PUT
         [HttpPut("{id}")]
         public Currency Put(int id, [FromBody] Currency c)
         {

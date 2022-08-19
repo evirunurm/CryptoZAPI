@@ -7,9 +7,9 @@ using System.Text;
 namespace CryptoZAPI.Models
 {
 	public class History
-	{	
-        // public Guid Id { get; set; } = Guid.NewGuid();
-
+	{
+        [Key]
+        public Guid Id { get; set; } = Guid.NewGuid();
         [Index(0)]
         [Name("origin")]
 		public string Origin { get; set; }

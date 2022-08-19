@@ -23,9 +23,9 @@ namespace CryptoZAPI.Controllers
 
         // GET
         [HttpGet("{idUser}")]
-        public IEnumerable<History> GetAll(int idUser)
+        public IEnumerable<History> GetAll(int idUser, int limit)
         {
-            // Find History for a user
+            // Find History for a user, with limit
             return new List<History>();
         }
 

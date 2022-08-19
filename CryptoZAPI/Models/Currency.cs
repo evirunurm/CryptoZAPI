@@ -8,7 +8,9 @@ namespace CryptoZAPI.Models
     public class Currency
     {
         [Key]
-        public string Id { get; set; }
+        public int Id { get; set; }
+        [Required]
+        public string Code { get; set; }
         [Required]
         [MaxLength(25)]
         public string Name { get; set; }
@@ -19,9 +21,9 @@ namespace CryptoZAPI.Models
 
         public string LogoUrl { get; set; }
 
-        public Currency(string id, string name, double price, DateTime priceDate, string logoUrl)
+        public Currency(string code, string name, double price, DateTime priceDate, string logoUrl)
         {
-            Id = id;
+            Code = code;
             Name = name;
             Price = price;
             PriceDate = priceDate;

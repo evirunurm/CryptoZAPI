@@ -15,5 +15,12 @@ namespace Models
 		public string Password { get; set; }
 		public string Salt { get; set; }
 
-	}
+        public User(string name, string email, string password, string salt)
+        {
+            Name = name;
+            Email = email;
+            Password = password;
+            Salt = salt;
+        }
+    }
 }
