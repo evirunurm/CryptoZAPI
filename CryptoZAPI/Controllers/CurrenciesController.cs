@@ -27,7 +27,7 @@ namespace CryptoZAPI.Controllers
 
 		// GET currencies
 		[HttpGet]
-		public IEnumerable<Currency>? GetAll()
+        public IActionResult GetAll()
 		{
 			if (!lastRequested.Equals(DateTime.Now.Date))
 			{
@@ -43,7 +43,12 @@ namespace CryptoZAPI.Controllers
 			try
 			{
 				Currencies = repository.GetAllCurrencies();
-                // TODO: Send a code 
+				// TODO: Send a code
+				Console.WriteLine(Currencies.Count);
+				if (Currencies.Count == 0)
+				{
+					return NoContent();
+				}
             }
             catch (Exception e) // TODO: Change Exception type
             {
@@ -51,7 +56,7 @@ namespace CryptoZAPI.Controllers
                 Console.WriteLine(e);
                 return null;
             }
-			return Currencies;
+			return Ok(Currencies);
 		}
 
 		// GET currencies/{id}
