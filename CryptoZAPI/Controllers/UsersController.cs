@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Repository;
+using Repo;
 
 namespace CryptoZAPI.Controllers
 {

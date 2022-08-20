@@ -1,7 +1,7 @@
 ﻿using CryptoZAPI.Models;
 using Models;
 
-namespace Repository
+namespace Repo
 {
     public interface IRepository
     {

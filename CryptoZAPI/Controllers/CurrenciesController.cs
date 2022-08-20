@@ -1,8 +1,7 @@
 ﻿using CryptoZAPI.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NomixServices;
-using Repository;
+using Repo;
 
 namespace CryptoZAPI.Controllers
 {
@@ -25,26 +24,23 @@ namespace CryptoZAPI.Controllers
 			this.lastRequested = DateTime.Now.Date;
         }
 
-		// GET currencies
-		[HttpGet]
-        public IActionResult GetAll()
+        // GET currencies
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Currency>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetAll()
 		{
 			if (!lastRequested.Equals(DateTime.Now.Date))
 			{
-				bool updated = UpdateDatabase();
-                if (!updated)
-				{
-					// TODO: Couldn't update database
-				}
+				bool updated = await UpdateDatabase();
             }
 
 			List<Currency>? Currencies;
 
-			try
+            try
 			{
 				Currencies = repository.GetAllCurrencies();
-				// TODO: Send a code
-				Console.WriteLine(Currencies.Count);
 				if (Currencies.Count == 0)
 				{
 					return NoContent();
@@ -52,20 +48,19 @@ namespace CryptoZAPI.Controllers
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                // TODO: Send a code 
                 Console.WriteLine(e);
-                return null;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
 			return Ok(Currencies);
 		}
 
 		// GET currencies/{id}
 		[HttpGet("{id}")]
-		public Currency? FindOne(int id)
+		public async Task<IActionResult> FindOne(int id)
 		{
 			if (!lastRequested.Equals(DateTime.Now.Date))
 			{
-                bool updated = UpdateDatabase();
+                bool updated = await UpdateDatabase();
                 if (!updated)
                 {
                     // TODO: Couldn't update database
@@ -86,7 +81,7 @@ namespace CryptoZAPI.Controllers
 				return null;
 			}
 
-			return currency;
+			return Ok(currency);
 		}
 
 		// PUT
@@ -109,12 +104,12 @@ namespace CryptoZAPI.Controllers
 			return c;
 		}
 
-		private bool UpdateDatabase()
+		private async Task<bool> UpdateDatabase()
 		{
             try
             {
-                List<Currency> CurrenciesToAdd = nomics.getCurrencies();
-                // TODO: Update currencies in database.
+                List<Currency> CurrenciesToAdd = nomics.getCurrencies(); // add await
+                // TODO: Update currencies in database. + await 
                 this.lastRequested = DateTime.Now.Date;
 				return true;
             }

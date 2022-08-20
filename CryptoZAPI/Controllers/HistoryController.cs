@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Repository;
+using Repo;
 using System.Collections.Generic;
 
 namespace CryptoZAPI.Controllers

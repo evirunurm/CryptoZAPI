@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NomixServices", "..\NomixSe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "..\Models\Models.csproj", "{287FAB13-15BA-4B2C-B901-0279FFC4CD95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "..\Repository\Repository.csproj", "{1001AF53-68C4-4959-A829-80353D1A11CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repo", "..\Repository\Repo.csproj", "{1001AF53-68C4-4959-A829-80353D1A11CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoZAPITests", "..\CryptoZAPITests\CryptoZAPITests.csproj", "{99275509-8F13-4BD1-9179-15892EB72D7F}"
 EndProject

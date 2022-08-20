@@ -31,7 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CryptoZAPI\CryptoZAPI.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
-    <ProjectReference Include="..\Repository\Repository.csproj" />
+    <ProjectReference Include="..\Repository\Repo.csproj" />
   </ItemGroup>
 
 </Project>
