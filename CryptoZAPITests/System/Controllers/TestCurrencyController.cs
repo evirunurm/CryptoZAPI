@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NomixServices;
-using Repository;
+using Repo;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Objects;
@@ -17,7 +17,7 @@ namespace CryptoZAPITests.System.Controllers;
 public class TestCurrencyController
 {
     [Fact]
-    public void GetAll_ShouldReturn200Status()
+    public async void GetAll_ShouldReturn200Status()
     {
         /// Arrange
         var repositoryService = new Mock<IRepository>();
@@ -29,15 +29,15 @@ public class TestCurrencyController
         var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object);
 
         /// Act
-        var result = (OkObjectResult)sut.GetAll();
-
+        var result = await sut.GetAll();
+        var okObjectResult = result as OkObjectResult;
 
         // /// Assert
-        result.StatusCode.Should().Be(200);
+        okObjectResult.StatusCode.Should().Be(200);
     }
 
     [Fact]
-    public void GetEmpty_ShouldReturn204Status()
+    public async void GetEmpty_ShouldReturn204Status()
     {
         /// Arrange
         var repositoryService = new Mock<IRepository>();
@@ -48,10 +48,11 @@ public class TestCurrencyController
         var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object);
 
         /// Act
-        var result = (NoContentResult)sut.GetAll();
+        var result = await sut.GetAll();
+        var noContenetResult = result as NoContentResult;
 
         /// Assert
-        result.StatusCode.Should().Be(204);
+        noContenetResult.StatusCode.Should().Be(204);
 
         // Makes sure the repository is called only once 
         // repositoryService.Verify(service => service.GetAllCurrencies(), Times.Exactly(1));
