@@ -26,7 +26,7 @@ namespace CryptoZAPI.Controllers
 
         // GET currencies
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Currency>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Currency>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll()
@@ -34,6 +34,11 @@ namespace CryptoZAPI.Controllers
 			if (!lastRequested.Equals(DateTime.Now.Date))
 			{
 				bool updated = await UpdateDatabase();
+				if (!updated)
+				{
+					return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
+
+                }
             }
 
 			List<Currency>? Currencies;
@@ -56,14 +61,17 @@ namespace CryptoZAPI.Controllers
 
 		// GET currencies/{id}
 		[HttpGet("{id}")]
-		public async Task<IActionResult> FindOne(int id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> FindOne(int id)
 		{
 			if (!lastRequested.Equals(DateTime.Now.Date))
 			{
                 bool updated = await UpdateDatabase();
                 if (!updated)
                 {
-                    // TODO: Couldn't update database
+                    return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
                 }
 			}
 			
@@ -72,13 +80,11 @@ namespace CryptoZAPI.Controllers
 			try
 			{
 				currency = repository.GetOneCurrency(id);
-                // TODO: Send a code 
             }
             catch (ArgumentNullException e)
 			{
-				// TODO: Send a code 
 				Console.WriteLine(e.Message);
-				return null;
+				return NotFound();
 			}
 
 			return Ok(currency);
@@ -86,22 +92,22 @@ namespace CryptoZAPI.Controllers
 
 		// PUT
 		[HttpPut("{id}")]
-		public Currency? Put(int id, [FromBody] Currency c)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Put(int id, [FromBody] Currency c)
 		{
+			Currency newCurrency = null;
 			try
 			{
-				repository.ModifyCurrency(id, c);
-                // TODO: Send a code 
+                newCurrency = repository.ModifyCurrency(id, c); 
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                // TODO: Send a code 
                 Console.WriteLine(e.Message);
-				return null;
+				return NotFound();
 			}
-			// hara cosas
 			// Cambiar name of Currency c where id == id
-			return c;
+			return Ok(newCurrency);
 		}
 
 		private async Task<bool> UpdateDatabase()

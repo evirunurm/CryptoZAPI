@@ -24,7 +24,10 @@ namespace CryptoZAPI.Controllers
 
         // GET
         [HttpGet("{idUser}")]
-        public IEnumerable<History>? GetAll(int idUser, int limit)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<History>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetAll(int idUser, int limit)
         {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
             List<History>? histories;
@@ -32,20 +35,24 @@ namespace CryptoZAPI.Controllers
             try
             {
                 histories = repository.GetAllHistoriesForUser(idUser, limit);
-                // TODO: Send a code 
+                if (histories.Count == 0) { 
+                    return NoContent();
+                }
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                // TODO: Send a code 
-                Console.WriteLine(e.Message);
-                return null;
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
-            return histories;
+            return Ok(histories);
         }
 
         // POST
         [HttpPost]
-        public History? Post([FromBody] History history)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(History))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> Post([FromBody] History history)
         {
             History? newHistory;
 
@@ -55,15 +62,17 @@ namespace CryptoZAPI.Controllers
             try
             {
                 newHistory = repository.CreateHistory(history);
-                // TODO: Send a code 
+                if (newHistory is null)
+                {
+                    return NotFound();
+                }
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                // TODO: Send a code 
                 Console.WriteLine(e.Message);
-                return null;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
-            return newHistory;
+            return Ok(newHistory);
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CryptoZAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Repo;
@@ -21,63 +22,73 @@ namespace CryptoZAPI.Controllers
 
         // POST users
         [HttpPost]
-        public User? Post([FromBody] User user)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(User))]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> Post([FromBody] User user)
         {
             // TODO: Convert user.password to Hash + salt
             // TODO: Add user.Salt
             try
             {
                 repository.CreateUser(user);
-                // TODO: Send a code 
             }
             catch (Exception e) // TODO: Change Exception type
-            {
-                // TODO: Send a code 
+            { 
                 Console.WriteLine(e.Message);
-                return null;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
             }
 
-            return user;
+            return Created($"/users/{user.Id}", user); // TODO: Idk what is this??? 
+            // return Ok(user);
         }
 
 
         // PUT users/5
         [HttpPut("{id}")]
-        public User? Put(int id, [FromBody] User newUser)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> Put(int id, [FromBody] User newUser)
         {
+
+            User user = null;
             try
             {
-                repository.ModifyUser(id, newUser);
-                // TODO: Send a code 
+                user = repository.ModifyUser(id, newUser); 
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                // TODO: Send a code 
                 Console.WriteLine(e.Message);
-                return null;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
             }
-            return newUser;
+            return Ok(user);
         }
 
 
         // GET
         [HttpGet("{id}")]
-        public User? FindOne(int id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> FindOne(int id)
         {
-            User? user;
+            User user;
             try
             {
                 user = repository.GetOneUser(id);
-                // TODO: Send a code 
             }
-            catch (Exception e) // TODO: Change Exception type
+            catch (ArgumentNullException e)
             {
-                // Send a code 
                 Console.WriteLine(e.Message);
-                return null;
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
 
-            return user;
+
+            return Ok(user);
         }
 
     }
