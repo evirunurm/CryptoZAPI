@@ -40,7 +40,7 @@ namespace CryptoZAPI.Controllers
 
                 }
             }
-
+			
 			List<Currency>? Currencies;
 
             try
@@ -114,7 +114,7 @@ namespace CryptoZAPI.Controllers
 		{
             try
             {
-                List<Currency> CurrenciesToAdd = nomics.getCurrencies(); // add await
+                List<Currency> CurrenciesToAdd = await nomics.getCurrencies();
                 // TODO: Update currencies in database. + await 
                 this.lastRequested = DateTime.Now.Date;
 				return true;

@@ -9,10 +9,10 @@ namespace CryptoZAPI.Models
     public class Currency
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        private Guid Id { get; set; } = Guid.NewGuid();
         [Required]
         [Index(IsUnique=true)]
-        [MaxLength(5)]
+        [MaxLength(10)]
         public string Code { get; set; }
         [Required]
         [MaxLength(25)]
@@ -22,13 +22,13 @@ namespace CryptoZAPI.Models
         public DateTime PriceDate { get; set; }
         public string LogoUrl { get; set; }
 
-        public Currency(string code, string name, double price, DateTime priceDate, string logoUrl)
+        public Currency(string id, string name, double price, DateTime price_date, string logo_url)
         {
-            Code = code;
+            Code = id;
             Name = name;
             Price = price;
-            PriceDate = priceDate;
-            LogoUrl = logoUrl;
+            PriceDate = price_date;
+            LogoUrl = logo_url;
         }
     }
 

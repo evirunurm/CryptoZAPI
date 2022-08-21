@@ -1,5 +1,6 @@
 using NomixServices;
 using Repo;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,9 @@ builder.Services.AddSwaggerGen();
 // Custom Services
 builder.Services.AddSingleton<INomics, Nomics>();
 builder.Services.AddSingleton<IRepository, Repository>();
+builder.Services.AddHttpClient<INomics, Nomics>(client => {
+    client.BaseAddress = new Uri("https://api.nomics.com/v1/");
+});
 
 var app = builder.Build();
 
