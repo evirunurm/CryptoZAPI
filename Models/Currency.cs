@@ -10,7 +10,7 @@ namespace CryptoZAPI.Models
     {
         [Key]
     //El id debería ser publico, private set
-        public readonly Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; } = Guid.NewGuid();
         [Required]
         [Index(IsUnique=true)]
         [MaxLength(10)]
@@ -31,6 +31,8 @@ namespace CryptoZAPI.Models
             PriceDate = price_date;
             LogoUrl = logo_url;
         }
+
+
     }
 
 }
