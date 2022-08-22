@@ -14,11 +14,18 @@ namespace CryptoZAPI.Controllers {
         private readonly IRepository repository;
         private DateTime lastRequested;
 
+        // Optimización  
+        //private readonly int lastRequestMinuteOffset = 10;
+        
+
         public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository) {
             this._logger = logger;
             this.nomics = nomics;
             this.repository = repository;
             this.lastRequested = DateTime.Now.Date;
+
+            //
+
         }
 
         // GET currencies
@@ -27,6 +34,10 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
+
+            // Optimización            
+            //if (DateTime.Now.Date.CompareTo(lastRequested) > 0) { 
+
             if (!lastRequested.Equals(DateTime.Now.Date)) {
                 bool updated = await UpdateDatabase();
                 if (!updated) {
@@ -59,8 +70,7 @@ namespace CryptoZAPI.Controllers {
         public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save) {
             // conversion = result
             double result = 0;
-
-
+            
             // if (save) pues guarda history
             //		History h;
             // if catch --> Forbidden();
@@ -159,6 +169,10 @@ namespace CryptoZAPI.Controllers {
                 List<Currency> CurrenciesToAdd = await nomics.getCurrencies();
                 // TODO: Update currencies in database. + await 
                 this.lastRequested = DateTime.Now.Date;
+
+                // Optimización
+                //this.lastRequested = DateTime.Now.Date.AddMinutes(lastRequestMinuteOffset);
+
                 return true;
             }
             catch (Exception e) // TODO: Change Exception type
