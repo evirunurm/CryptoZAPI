@@ -1,18 +1,4 @@
-﻿using Castle.Core.Logging;
-using CryptoZAPI.Controllers;
-using CryptoZAPITests.MockData;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
-using NomixServices;
-using Repo;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-namespace CryptoZAPITests.System.Controllers;
+﻿namespace CryptoZAPITests.System.Controllers;
 
 public class TestCurrencyController
 {

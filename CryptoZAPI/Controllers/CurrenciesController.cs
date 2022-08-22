@@ -40,7 +40,7 @@ namespace CryptoZAPI.Controllers
 
                 }
             }
-			
+
 			List<Currency>? Currencies;
 
             try
@@ -59,8 +59,33 @@ namespace CryptoZAPI.Controllers
 			return Ok(Currencies);
 		}
 
-		// GET currencies/{id}
-		[HttpGet("{id}")]
+        [HttpPost("/convert")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(double))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(double))]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save)
+        {
+			// conversion = result
+			double result = 0;
+
+
+			// if (save) pues guarda history
+            //		History h;
+			// if catch --> Forbidden();
+
+			return Ok(result);
+
+
+			/*OPCION DOS
+			 * Desde el frontend llamar primero a GetConversion: se devuelve la conversion
+			 * Si está logeado y el check está seleccionado: llama a otra función PostHistory, que almacene en el historial
+			 */
+       
+        }
+
+        // GET currencies/{id}
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
@@ -109,6 +134,8 @@ namespace CryptoZAPI.Controllers
 			// Cambiar name of Currency c where id == id
 			return Ok(newCurrency);
 		}
+
+		
 
 		private async Task<bool> UpdateDatabase()
 		{

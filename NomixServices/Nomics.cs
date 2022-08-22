@@ -26,10 +26,10 @@ namespace NomixServices
         {
             string ApiKey = configuration["environmentVariables:ApiKey"];
 
-            Console.WriteLine(ApiKey);
             var result = await client.GetAsync($"currencies/ticker?key={ApiKey}");
             var info = await result.Content.ReadAsStringAsync();
 
+            // TODO: Check null
             List<Currency> currencies = JsonConvert.DeserializeObject<List<Currency>>(info);
 
             return currencies;
