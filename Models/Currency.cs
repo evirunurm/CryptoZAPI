@@ -10,7 +10,7 @@ namespace CryptoZAPI.Models
     {
         [Key]
     //El id debería ser publico, private set
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public readonly Guid Id { get; private set; } = Guid.NewGuid();
         [Required]
         [Index(IsUnique=true)]
         [MaxLength(10)]

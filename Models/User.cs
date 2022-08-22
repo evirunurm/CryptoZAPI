@@ -6,7 +6,7 @@ namespace Models
 	public class User
 	{
 		[Key]
-		public Guid Id { get; set; } = Guid.NewGuid();
+		public readonly Guid Id { get; private set; } = Guid.NewGuid();
 		[Required]
         [MaxLength(64)]
         public string Name { get; set; }

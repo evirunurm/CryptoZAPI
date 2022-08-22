@@ -9,7 +9,7 @@ namespace CryptoZAPI.Models
 	public class History
 	{
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public readonly Guid Id { get; private set; } = Guid.NewGuid();
         [Required]
         public int Origin { get; set; }
         [Required]
