@@ -34,8 +34,8 @@ namespace CryptoZAPI.Models
         }
 
         public History(Currency origin, Currency destination, double value, double result, DateTime date, User user) {
-            Origin = origin.Id;
-            Destination = destination.Id;
+            Origin = origin.Id_old;
+            Destination = destination.Id_old;
             Value = value;
             Result = result;
             Date = date;

@@ -9,7 +9,8 @@ namespace CryptoZAPI.Models
     public class Currency
     {
         [Key]
-        public Guid Id { get; } = Guid.NewGuid();
+        public int Id { get; set; }
+        public Guid Id_old { get; } = Guid.NewGuid();
         [Required]
         [Index(IsUnique=true)]
         [MaxLength(10)]
@@ -30,7 +31,10 @@ namespace CryptoZAPI.Models
             PriceDate = price_date;
             LogoUrl = logo_url;
         }
+        public Currency()
+        {
 
+        }
 
     }
 

@@ -36,7 +36,7 @@ namespace CryptoZAPI.Controllers {
         public async Task<IActionResult> GetAll() {
 
             // Optimización            
-            //if (DateTime.Now.Date.CompareTo(lastRequested) > 0) { 
+            //if (DateTime.Now.CompareTo(lastRequested) > 0) { 
 
             if (!lastRequested.Equals(DateTime.Now.Date)) {
                 bool updated = await UpdateDatabase();

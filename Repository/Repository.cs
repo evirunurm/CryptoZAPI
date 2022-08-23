@@ -1,4 +1,5 @@
 ﻿using CryptoZAPI.Models;
+using Data;
 using Models;
 
 namespace Repo
@@ -34,6 +35,9 @@ namespace Repo
 
     public class Repository : IRepository
     {
+
+        CurrencyContext _context = new CurrencyContext();
+
         public History CreateHistory(History history)
         {
             throw new NotImplementedException();
@@ -46,7 +50,8 @@ namespace Repo
 
         public List<Currency> GetAllCurrencies()
         {
-            throw new NotImplementedException();
+
+            return _context.Currencies.ToList();
         }
 
         public List<History> GetAllHistoriesForUser(Guid userId, int limit)
@@ -72,6 +77,11 @@ namespace Repo
         public User ModifyUser(int id, User user)
         {
             throw new NotImplementedException();
+        }
+
+        private async Task saveDB()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

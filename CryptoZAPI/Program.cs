@@ -1,3 +1,5 @@
+using Data;
+using Microsoft.EntityFrameworkCore;
 using NomixServices;
 using Repo;
 using static System.Net.Mime.MediaTypeNames;
@@ -10,6 +12,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// DB
+var connectionString = builder.Configuration.GetConnectionString("AppDb");
+builder.Services.AddDbContext<CurrencyContext>(x => x.UseSqlServer(connectionString));
 
 // Custom Services
 builder.Services.AddSingleton<INomics, Nomics>();
