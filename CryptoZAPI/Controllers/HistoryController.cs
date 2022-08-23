@@ -27,7 +27,7 @@ namespace CryptoZAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<History>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll(int idUser, int limit)
+        public async Task<IActionResult> GetAll(Guid idUser, int limit)
         {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
             List<History>? histories;

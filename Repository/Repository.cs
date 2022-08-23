@@ -25,7 +25,7 @@ namespace Repo
 
         // Histories
         // GET
-        List<History> GetAllHistoriesForUser(int userId, int limit);
+        List<History> GetAllHistoriesForUser(Guid userId, int limit);
         // POST
         History CreateHistory(History history);
 
@@ -49,7 +49,7 @@ namespace Repo
             throw new NotImplementedException();
         }
 
-        public List<History> GetAllHistoriesForUser(int userId, int limit)
+        public List<History> GetAllHistoriesForUser(Guid userId, int limit)
         {
             throw new NotImplementedException();
         }

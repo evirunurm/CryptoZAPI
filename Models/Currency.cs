@@ -9,7 +9,6 @@ namespace CryptoZAPI.Models
     public class Currency
     {
         [Key]
-    //El id debería ser publico, private set
         public Guid Id { get; } = Guid.NewGuid();
         [Required]
         [Index(IsUnique=true)]

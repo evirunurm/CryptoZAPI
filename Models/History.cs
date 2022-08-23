@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,18 +12,18 @@ namespace CryptoZAPI.Models
         [Key]
         public Guid Id { get; } = Guid.NewGuid();
         [Required]
-        public int Origin { get; set; }
+        public Guid Origin { get; }
         [Required]
-        public int UserId { get; set; }
+        public Guid UserId { get; }
         [Required]
-        public int Destination { get; set; }
+        public Guid Destination { get; }
         [Required]
         public double Value { get; set; }
         [Required]
         public double Result { get; set; }
 		public DateTime Date { get; set; }
 
-		public History(int origin, int destination, double value, double result, DateTime date, int userId)
+		public History(Guid origin, Guid destination, double value, double result, DateTime date, Guid userId)
         {
             Origin = origin;
             Destination = destination;
@@ -30,6 +31,24 @@ namespace CryptoZAPI.Models
             Result = result;
             Date = date;
             UserId = userId;
+        }
+
+        public History(Currency origin, Currency destination, double value, double result, DateTime date, User user) {
+            Origin = origin.Id;
+            Destination = destination.Id;
+            Value = value;
+            Result = result;
+            Date = date;
+            UserId = user.Id;
+        }
+
+        public History(Guid origin, Guid destination, double value, double result, DateTime date, User user) {
+            Origin = origin;
+            Destination = destination;
+            Value = value;
+            Result = result;
+            Date = date;
+            UserId = user.Id;
         }
     }
 }

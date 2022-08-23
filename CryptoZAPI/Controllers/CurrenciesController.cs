@@ -42,7 +42,6 @@ namespace CryptoZAPI.Controllers {
                 bool updated = await UpdateDatabase();
                 if (!updated) {
                     return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
-
                 }
             }
 
@@ -50,6 +49,14 @@ namespace CryptoZAPI.Controllers {
 
             try {
                 Currencies = repository.GetAllCurrencies();
+                Currencies = new List<Currency>();
+                Currencies.Add(new Currency(
+                 "USD",
+                 "Dollar",
+                 1,
+                  DateTime.Parse("2022-08-02T00:00:00Z"),
+                 ""
+                ));
                 if (Currencies.Count == 0) {
                     return NoContent();
                 }
