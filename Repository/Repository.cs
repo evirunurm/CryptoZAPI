@@ -36,7 +36,8 @@ namespace Repo
     public class Repository : IRepository
     {
 
-        CurrencyContext _context = new CurrencyContext();
+        CryptoZContext _context = new CryptoZContext();
+   
 
         public History CreateHistory(History history)
         {

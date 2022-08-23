@@ -13,18 +13,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DB
-var connectionString = builder.Configuration.GetConnectionString("AppDb");
-builder.Services.AddDbContext<CurrencyContext>(x => x.UseSqlServer(connectionString));
 
 // Custom Services
 builder.Services.AddSingleton<INomics, Nomics>();
+
+
+//Repository repo = new Repository(_context);
 builder.Services.AddSingleton<IRepository, Repository>();
-builder.Services.AddHttpClient<INomics, Nomics>(client => {
+
+
+builder.Services.AddHttpClient<INomics, Nomics>(client =>
+{
     client.BaseAddress = new Uri("https://api.nomics.com/v1/");
 });
 
 var app = builder.Build();
+
+//
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,5 +1,6 @@
 ﻿using CryptoZAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Models;
 // using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,11 @@ using System.Threading.Tasks;
 
 namespace Data
 {
-    public class CurrencyContext : DbContext
+    public class CryptoZContext : DbContext
     {
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<History> History { get; set; }
+        public DbSet<User> User { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,6 +25,8 @@ namespace Data
 
             // var connectionString = configuration.GetConnectionString("AppDb");
             optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
+
+       
         }
     }
 }

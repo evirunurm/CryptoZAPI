@@ -10,45 +10,20 @@ namespace CryptoZAPI.Models
 	public class History
 	{
         [Key]
-        public Guid Id { get; } = Guid.NewGuid();
+        public int Id { get; set; }
         [Required]
-        public Guid Origin { get; }
+        public int Origin { get; set;}
         [Required]
-        public Guid UserId { get; }
+        public int UserId { get; set;}
         [Required]
-        public Guid Destination { get; }
+        public int Destination { get; set;}
         [Required]
         public double Value { get; set; }
         [Required]
         public double Result { get; set; }
 		public DateTime Date { get; set; }
 
-		public History(Guid origin, Guid destination, double value, double result, DateTime date, Guid userId)
-        {
-            Origin = origin;
-            Destination = destination;
-            Value = value;
-            Result = result;
-            Date = date;
-            UserId = userId;
-        }
 
-        public History(Currency origin, Currency destination, double value, double result, DateTime date, User user) {
-            Origin = origin.Id_old;
-            Destination = destination.Id_old;
-            Value = value;
-            Result = result;
-            Date = date;
-            UserId = user.Id;
-        }
-
-        public History(Guid origin, Guid destination, double value, double result, DateTime date, User user) {
-            Origin = origin;
-            Destination = destination;
-            Value = value;
-            Result = result;
-            Date = date;
-            UserId = user.Id;
-        }
+       
     }
 }

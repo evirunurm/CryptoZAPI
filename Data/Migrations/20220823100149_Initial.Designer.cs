@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
-    [DbContext(typeof(CurrencyContext))]
+    [DbContext(typeof(CryptoZContext))]
     [Migration("20220823100149_Initial")]
     partial class Initial
     {
