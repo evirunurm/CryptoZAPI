@@ -1,4 +1,5 @@
-﻿using CryptoZAPI.Models;
+﻿using AutoMapper;
+using CryptoZAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using NomixServices;
 using Repo;
@@ -14,15 +15,19 @@ namespace CryptoZAPI.Controllers {
         private readonly IRepository repository;
         private DateTime lastRequested;
 
+        // Mapper
+        private readonly IMapper _mapper;
+
         // Optimización  
         //private readonly int lastRequestMinuteOffset = 10;
         
 
-        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository) {
+        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository, IMapper mapper) {
             this._logger = logger;
             this.nomics = nomics;
             this.repository = repository;
             this.lastRequested = DateTime.Now.Date;
+            this._mapper = mapper;  
 
             //
 
