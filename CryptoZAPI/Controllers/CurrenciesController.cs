@@ -54,19 +54,15 @@ namespace CryptoZAPI.Controllers {
                 }
             }
 
-            List<CurrencyDto>? Currencies;
-
             try {
-              
-                
-                
+                List<CurrencyDto> Currencies = _mapper.Map<List<CurrencyDto>>(repository.GetAllCurrencies());
+                return Ok(Currencies);
             }
             catch (Exception e) // TODO: Change Exception type
             {
                 Console.WriteLine(e);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
-            return Ok();
         }
 
         [HttpPost("/convert")]
@@ -138,17 +134,16 @@ namespace CryptoZAPI.Controllers {
                 }
             }
 
-            Currency? currency;
-
+            // Pensar como hacer para que devuelva una excepcion en caso de que no exista la moneda de forma "más elegante"
             try {
-                currency = repository.GetOneCurrency(id);
+                CurrencyDto currency = _mapper.Map<CurrencyDto>(repository.GetOneCurrency(id));                
+                return Ok(currency);
             }
             catch (ArgumentNullException e) {
                 Console.WriteLine(e.Message);
                 return NotFound();
             }
 
-            return Ok(currency);
         }
 
         // PUT
@@ -178,7 +173,14 @@ namespace CryptoZAPI.Controllers {
 
                 List<CurrencyForCreationDto> CurrenciesToAdd = _mapper.Map<List<CurrencyForCreationDto>>(CurrenciesDtoToAdd);
 
-                repository.CreateCurrency(_mapper.Map<Currency>(CurrenciesToAdd[0]));
+                int count = 0;
+                foreach (CurrencyForCreationDto c in CurrenciesToAdd) {
+                    repository.CreateCurrency(_mapper.Map<Currency>(c));
+                    count++;
+                    if (count == 10)
+                        break;
+                }
+                
 
                 // TODO: Update currencies in database. + await 
 
