@@ -19,7 +19,7 @@ namespace NomixServices
         public Nomics(HttpClient client, IConfiguration configuration)
         {
             this.client = client;
-            this.configuration = configuration;
+            this.configuration = configuration; 
         }
 
         public async Task<List<CurrencyDto>> getCurrencies()
