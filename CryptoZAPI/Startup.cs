@@ -1,20 +1,5 @@
-﻿//public class Startup {
-
-//    public IConfiguration Configuration { get;}
-
-//    public Startup(IConfiguration configuration) {
-//        this.Configuration = configuration;
-//    }
-
-//    public void ConfigureServices(IServiceCollection services) {
-//        services.AddControllers();
-
-//    }
-
-//    public void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime) {
-//    }
-//}
-
+﻿using CryptoZAPI.Models;
+using Models.Mappers;
 using NomixServices;
 using Repo;
 
@@ -23,7 +8,8 @@ public static class Startup {
     public static void ConfigureServices(this WebApplicationBuilder builder) {
 
         // AutoMapper
-        builder.Services.AddAutoMapper(typeof(Program));
+        //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        builder.Services.AddAutoMapper(typeof(CurrencyProfile));
 
         // Controllers
         builder.Services.AddControllers();

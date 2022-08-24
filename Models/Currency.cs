@@ -21,10 +21,7 @@ namespace CryptoZAPI.Models
         [Required]
         public double Price { get; set; }
         public DateTime PriceDate { get; set; }
-        public string LogoUrl { get; set; }
-
-        
-
+        public string LogoUrl { get; set; }        
     }
 
 }

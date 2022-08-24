@@ -12,16 +12,15 @@ namespace CryptoZAPI.Models
         [Required]
         [Index(IsUnique=true)]
         [MaxLength(10)]
-        [JsonPropertyName("id")]
-        public string Code { get; set; }
+        public string? Id { get; set; }
         [Required]
         [MaxLength(25)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Required]
         public double Price { get; set; }
         [Required]
-        public DateTime PriceDate { get; set; }
-        public string logo_url { get; set; }
+        public DateTime price_date { get; set; }
+        public string? logo_url { get; set; }
 
      
 

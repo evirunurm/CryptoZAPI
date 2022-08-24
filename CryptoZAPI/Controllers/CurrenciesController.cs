@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CryptoZAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Models.Mappers;
 using NomixServices;
 using Repo;
 
@@ -171,8 +172,14 @@ namespace CryptoZAPI.Controllers {
 
         private async Task<bool> UpdateDatabase() {
             try {
-                List<CurrencyDto> CurrenciesToAdd = await nomics.getCurrencies();
+
+                List<CurrencyDto> CurrenciesDtoToAdd = await nomics.getCurrencies();
+
+                List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(CurrenciesDtoToAdd);
+
                 // TODO: Update currencies in database. + await 
+
+
                 this.lastRequested = DateTime.Now.Date;
 
                 // Optimización
