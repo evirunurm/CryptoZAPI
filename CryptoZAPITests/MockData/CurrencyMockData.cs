@@ -8,8 +8,12 @@ using System.Threading.Tasks;
 namespace CryptoZAPITests.MockData;
 class CurrencyMockData
 {
+    
     public static List<Currency> GetAll()
     {
+
+        return null;
+        /*
         return new List<Currency>{
              new Currency(
                  "USD",
@@ -46,7 +50,7 @@ class CurrencyMockData
                  DateTime.Parse("2022-08-02T00:00:00Z"),
                  ""
              )
-         };
+         };*/
     }
 
     public static List<Currency> GetEmpty()

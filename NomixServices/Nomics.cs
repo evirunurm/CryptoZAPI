@@ -8,7 +8,7 @@ namespace NomixServices
 {
     public interface INomics
     {
-        Task<List<Currency>> getCurrencies();
+        Task<List<CurrencyDto>> getCurrencies();
     }
 
     public class Nomics : INomics
@@ -22,7 +22,7 @@ namespace NomixServices
             this.configuration = configuration;
         }
 
-        public async Task<List<Currency>> getCurrencies()
+        public async Task<List<CurrencyDto>> getCurrencies()
         {
             string ApiKey = configuration["environmentVariables:ApiKey"];
 
@@ -30,7 +30,7 @@ namespace NomixServices
             var info = await result.Content.ReadAsStringAsync();
 
             // TODO: Check null
-            List<Currency> currencies = JsonConvert.DeserializeObject<List<Currency>>(info);
+            List<CurrencyDto> currencies = JsonConvert.DeserializeObject<List<CurrencyDto>>(info);
 
             return currencies;
         }

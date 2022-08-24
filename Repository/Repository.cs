@@ -13,6 +13,8 @@ namespace Repo
         Currency GetOneCurrency(int id);
         // PUT
         Currency ModifyCurrency(int id, Currency currency);
+        // POST
+        Currency CreateCurrency(CurrencyDto currencyDto);
 
 
         // Users
@@ -37,7 +39,11 @@ namespace Repo
     {
 
         CryptoZContext _context = new CryptoZContext();
-   
+
+        public Currency CreateCurrency(CurrencyDto currencyDto)
+        {
+            throw new NotImplementedException();
+        }
 
         public History CreateHistory(History history)
         {

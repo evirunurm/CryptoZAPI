@@ -38,35 +38,28 @@ namespace CryptoZAPI.Controllers {
             // Optimización            
             //if (DateTime.Now.CompareTo(lastRequested) > 0) { 
 
+              bool updated = await UpdateDatabase();
+
             if (!lastRequested.Equals(DateTime.Now.Date)) {
-                bool updated = await UpdateDatabase();
+                updated = await UpdateDatabase();
                 if (!updated) {
                     return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
                 }
             }
 
-            List<Currency>? Currencies;
+            List<CurrencyDto>? Currencies;
 
             try {
-                Currencies = repository.GetAllCurrencies();
-                Currencies = new List<Currency>();
-                Currencies.Add(new Currency(
-                 "USD",
-                 "Dollar",
-                 1,
-                  DateTime.Parse("2022-08-02T00:00:00Z"),
-                 ""
-                ));
-                if (Currencies.Count == 0) {
-                    return NoContent();
-                }
+              
+                
+                
             }
             catch (Exception e) // TODO: Change Exception type
             {
                 Console.WriteLine(e);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
-            return Ok(Currencies);
+            return Ok();
         }
 
         [HttpPost("/convert")]
@@ -173,7 +166,7 @@ namespace CryptoZAPI.Controllers {
 
         private async Task<bool> UpdateDatabase() {
             try {
-                List<Currency> CurrenciesToAdd = await nomics.getCurrencies();
+                List<CurrencyDto> CurrenciesToAdd = await nomics.getCurrencies();
                 // TODO: Update currencies in database. + await 
                 this.lastRequested = DateTime.Now.Date;
 
