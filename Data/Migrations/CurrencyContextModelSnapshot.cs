@@ -52,7 +52,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
                 });
 
             modelBuilder.Entity("CryptoZAPI.Models.History", b =>
@@ -83,7 +83,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("History");
+                    b.ToTable("History", (string)null);
                 });
 
             modelBuilder.Entity("Models.User", b =>
@@ -114,7 +114,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 #pragma warning restore 612, 618
         }

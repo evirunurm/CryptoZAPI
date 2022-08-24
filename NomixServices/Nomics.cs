@@ -1,11 +1,10 @@
-﻿using CryptoZAPI.Models;
-using System.Net;
+﻿using System.Net;
 using System;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
+using Models.DTO;
 
-namespace NomixServices
-{
+namespace NomixServices {
     public interface INomics
     {
         Task<List<CurrencyDto>> getCurrencies();

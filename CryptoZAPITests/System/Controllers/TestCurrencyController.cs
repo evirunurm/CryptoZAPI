@@ -12,7 +12,7 @@ public class TestCurrencyController
 
 
         repositoryService.Setup(_ => _.GetAllCurrencies()).Returns(CurrencyMockData.GetAll());
-        var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object);
+        var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
 
         /// Act
         var result = await sut.GetAll();
@@ -31,7 +31,7 @@ public class TestCurrencyController
         var nomicsService = new Mock<INomics>();
 
         repositoryService.Setup(service => service.GetAllCurrencies()).Returns(CurrencyMockData.GetEmpty());
-        var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object);
+        var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
 
         /// Act
         var result = await sut.GetAll();

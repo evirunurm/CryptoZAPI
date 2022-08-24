@@ -1,9 +1,9 @@
 ﻿using CryptoZAPI.Models;
 using Data;
 using Models;
+using Models.DTO;
 
-namespace Repo
-{
+namespace Repo {
     public interface IRepository
     {
         // All return types might have to be nullable, in case there's a captured Exception.
@@ -14,7 +14,7 @@ namespace Repo
         // PUT
         Currency ModifyCurrency(int id, Currency currency);
         // POST
-        Currency CreateCurrency(CurrencyDto currencyDto);
+        Currency CreateCurrency(Currency currency);
 
 
         // Users
@@ -40,9 +40,13 @@ namespace Repo
 
         CryptoZContext _context = new CryptoZContext();
 
-        public Currency CreateCurrency(CurrencyDto currencyDto)
+        public Currency CreateCurrency(Currency currency)
         {
-            throw new NotImplementedException();
+            _context.Currencies.Add(currency);
+            _context.SaveChanges();
+
+            //throw new NotImplementedException();
+            return currency;
         }
 
         public History CreateHistory(History history)

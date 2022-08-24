@@ -1,22 +1,20 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Models
-{
-	public class UserDto
-	{
-		
-		[Required]
+namespace Models.DTO {
+    public class UserDto {
+
+        [Required]
         [MaxLength(64)]
         public string Name { get; set; }
-		[Required]
+        [Required]
         [MaxLength(320)]
         public string Email { get; set; }
-		[Required]
+        [Required]
         public string Password { get; set; }
         [Required]
         public string Salt { get; set; }
 
-        
+
     }
 }

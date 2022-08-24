@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CryptoZAPI.Models;
+using Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,22 @@ namespace Models.Mappers {
                 .ForMember(dest => dest.LogoUrl,
                             opt => opt.MapFrom(src => src.logo_url))
                 .ReverseMap();
+
+            
+            CreateMap<CurrencyDto, CurrencyForCreationDto>()
+              .ForMember(dest => dest.Code,
+                          opt => opt.MapFrom(src => src.Id))
+              .ForMember(dest => dest.PriceDate,
+                          opt => opt.MapFrom(src => src.price_date))
+              .ForMember(dest => dest.LogoUrl,
+                          opt => opt.MapFrom(src => src.logo_url))
+              .ReverseMap();
+
+            // Quizá no haga falta ¿?
+            CreateMap<CurrencyForCreationDto, Currency>()
+               .ForMember(dest => dest.Id,
+                           opt => opt.Ignore()) // TODO: En lugar  de Ignorar, calcular/buscar el Id que le corresponde (o ignorarlo como ahora)              
+               .ReverseMap();
         }
     }
 }
