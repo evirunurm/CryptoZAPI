@@ -146,6 +146,17 @@ namespace CryptoZAPI.Controllers {
 
         }
 
+        // GET currencies/convert
+        [HttpGet("/convert")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetConversion(int id)
+        {
+            // TODO 
+            return null;
+        }
+
         // PUT
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]

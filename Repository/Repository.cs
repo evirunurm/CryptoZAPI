@@ -42,16 +42,16 @@ namespace Repo {
             var old_currency = _context.Currencies.FirstOrDefault(c => c.Code == currency.Code);
 
             if (old_currency == null) {
-                _context.Currencies.Add(currency);
+                _context.Currencies.Add(currency); // TODO: Make async 
 
-                _context.SaveChanges();
+                _context.SaveChanges(); // TODO: Use separate method for saving saveDB()
                 old_currency = currency;
             }
             else {
-                ModifyCurrency(old_currency.Id, currency);
+                ModifyCurrency(old_currency.Id, currency); // TODO: Make async
             }
 
-            //throw new NotImplementedException();
+
             return old_currency;
         }
 
