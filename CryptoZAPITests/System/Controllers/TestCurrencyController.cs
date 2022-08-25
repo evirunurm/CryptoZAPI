@@ -11,7 +11,7 @@ public class TestCurrencyController
         var nomicsService = new Mock<INomics>();
 
 
-        repositoryService.Setup(_ => _.GetAllCurrencies()).Returns(CurrencyMockData.GetAll());
+        //repositoryService.Setup(_ => _.GetAllCurrencies()).Returns(await CurrencyMockData.GetAll());
         var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
 
         /// Act
@@ -30,7 +30,7 @@ public class TestCurrencyController
         var loggerService = new Mock<ILogger>();
         var nomicsService = new Mock<INomics>();
 
-        repositoryService.Setup(service => service.GetAllCurrencies()).Returns(CurrencyMockData.GetEmpty());
+        //repositoryService.Setup(service => service.GetAllCurrencies()).Returns(CurrencyMockData.GetEmpty());
         var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
 
         /// Act

@@ -47,7 +47,7 @@ namespace CryptoZAPI.Controllers {
             }
 
             try {
-                List<CurrencyDto> Currencies = _mapper.Map<List<CurrencyDto>>(repository.GetAllCurrencies());
+                List<CurrencyDto> Currencies = _mapper.Map<List<CurrencyDto>>(await repository.GetAllCurrencies());
                 return Ok(Currencies);
             }
             catch (Exception e) // TODO: Change Exception type
@@ -62,7 +62,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(double))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save) {
+        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save) { 
             // conversion = result
             double result = 0;
             
@@ -178,7 +178,7 @@ namespace CryptoZAPI.Controllers {
 
                 int count = 0;
                 foreach (CurrencyForCreationDto c in CurrenciesToAdd) {
-                    repository.CreateCurrency(_mapper.Map<Currency>(c));
+                    await repository.CreateCurrency(_mapper.Map<Currency>(c));
                     count++;
                     if (count == 10)
                         break;

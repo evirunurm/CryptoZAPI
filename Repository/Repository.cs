@@ -11,6 +11,7 @@ namespace Repo {
         // GET
         Task<List<Currency>> GetAllCurrencies();
         Task<Currency?> GetOneCurrency(int id);
+         Task<Currency?> GetOneCurrency(string code);
         // PUT
         Task<Currency> ModifyCurrency(int id, Currency currency);
         // POST
@@ -51,6 +52,14 @@ namespace Repo {
         public async Task<Currency?> GetOneCurrency(int id)
         {
             Currency currency = _context.Currencies.FirstOrDefault(c => c.Id == id) ??
+                throw new ArgumentNullException("No existe la moneda parameter");
+
+            return currency;
+        }
+
+        public async Task<Currency?> GetOneCurrency(string code)
+        {
+            Currency currency = _context.Currencies.FirstOrDefault(c => c.Code == code) ??
                 throw new ArgumentNullException("No existe la moneda parameter");
 
             return currency;
@@ -104,8 +113,21 @@ namespace Repo {
             throw new NotImplementedException();
         }
 
-        public async Task<History> CreateHistory(History history) {
-			throw new NotImplementedException();
+        public async Task<History> CreateHistory(History history) 
+        {
+            try{
+                history.Date = DateTime.Now;
+                await _context.History.AddAsync(history);
+                await saveDB();
+
+                return history;
+             
+            }
+            catch (Exception e)
+            {
+                throw new Exception();
+            }
+          			
 		}
 
 

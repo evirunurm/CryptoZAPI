@@ -22,6 +22,7 @@ namespace CryptoZAPI.Models
         public int DestinationId { get; set; }
 
 
+
         public User User { get; set; }
         [Required]
         public int UserId { get; set; }
