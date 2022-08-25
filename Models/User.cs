@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CryptoZAPI.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Models
@@ -17,6 +18,7 @@ namespace Models
         public string Password { get; set; }
         public string Salt { get; set; }
 
+        public List<History> Histories { get; set; }
         
     }
 }

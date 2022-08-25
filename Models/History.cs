@@ -11,12 +11,20 @@ namespace CryptoZAPI.Models
 	{
         [Key]
         public int Id { get; set; }
+      
+        public Currency Origin { get; set;}
         [Required]
-        public int Origin { get; set;}
+        public int OriginId { get; set; }
+
+        
+        public Currency Destination { get; set;}
         [Required]
-        public int UserId { get; set;}
+        public int DestinationId { get; set; }
+
+
+        public User User { get; set; }
         [Required]
-        public int Destination { get; set;}
+        public int UserId { get; set; }
         [Required]
         public double Value { get; set; }
         [Required]

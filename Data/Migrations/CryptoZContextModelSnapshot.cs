@@ -4,7 +4,6 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,10 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(CryptoZContext))]
-    [Migration("20220823115509_AddTables")]
-    partial class AddTables
+    partial class CryptoZContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,10 +66,10 @@ namespace Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Destination")
+                    b.Property<int>("DestinationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Origin")
+                    b.Property<int>("OriginId")
                         .HasColumnType("int");
 
                     b.Property<double>("Result")
@@ -84,6 +82,12 @@ namespace Data.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("OriginId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("History");
                 });
@@ -117,6 +121,45 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("CryptoZAPI.Models.History", b =>
+                {
+                    b.HasOne("CryptoZAPI.Models.Currency", "Destination")
+                        .WithMany("HistoriesDestination")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CryptoZAPI.Models.Currency", "Origin")
+                        .WithMany("HistoriesOrigin")
+                        .HasForeignKey("OriginId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Models.User", "User")
+                        .WithMany("Histories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("Origin");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CryptoZAPI.Models.Currency", b =>
+                {
+                    b.Navigation("HistoriesDestination");
+
+                    b.Navigation("HistoriesOrigin");
+                });
+
+            modelBuilder.Entity("Models.User", b =>
+                {
+                    b.Navigation("Histories");
                 });
 #pragma warning restore 612, 618
         }
