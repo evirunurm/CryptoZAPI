@@ -67,7 +67,7 @@ namespace CryptoZAPI.Controllers {
             double result = 0;
             
             // if (save) pues guarda history
-            //		History h;
+            //		Histories h;
             // if catch --> Forbidden();
 
             return Ok(result);
@@ -94,14 +94,14 @@ namespace CryptoZAPI.Controllers {
 
         
 		[HttpPut]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(¿History?))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(¿Histories?))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
 		public async Task<IActionResult> SaveConversion(string userId, string codeOrigin, string codeDestination, double converted_value) {
 			// conversion = result
 
-			History h;
+			Histories h;
 
             if (userId no existe) -> return 403
 			

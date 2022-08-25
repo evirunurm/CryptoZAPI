@@ -13,8 +13,8 @@ namespace Data
 	public class CryptoZContext : DbContext
 	{
 		public DbSet<Currency> Currencies { get; set; }
-		public DbSet<History> History { get; set; }
-		public DbSet<User> User { get; set; }
+		public DbSet<History> Histories { get; set; }
+		public DbSet<User> Users { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
