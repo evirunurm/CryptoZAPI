@@ -156,7 +156,7 @@ namespace CryptoZAPI.Controllers {
         public async Task<IActionResult> Put(int id, [FromBody] Currency c) {
             Currency newCurrency = null;
             try {
-                newCurrency = repository.ModifyCurrency(id, c);
+                newCurrency = await repository.ModifyCurrency(id, c);
             }
             catch (Exception e) // TODO: Change Exception type
             {

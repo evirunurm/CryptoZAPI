@@ -34,7 +34,7 @@ namespace CryptoZAPI.Controllers
 
             try
             {
-                histories = repository.GetAllHistoriesForUser(idUser, limit);
+                histories = await repository.GetAllHistoriesForUser(idUser, limit);
                 if (histories.Count == 0) { 
                     return NoContent();
                 }
@@ -61,7 +61,7 @@ namespace CryptoZAPI.Controllers
 
             try
             {
-                newHistory = repository.CreateHistory(history);
+                newHistory = await repository.CreateHistory(history);
                 if (newHistory is null)
                 {
                     return NotFound();

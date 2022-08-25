@@ -30,7 +30,7 @@ namespace CryptoZAPI.Controllers
             // TODO: Add user.Salt
             try
             {
-                repository.CreateUser(user);
+                await repository.CreateUser(user);
             }
             catch (Exception e) // TODO: Change Exception type
             { 
@@ -53,7 +53,7 @@ namespace CryptoZAPI.Controllers
             User user = null;
             try
             {
-                user = repository.ModifyUser(id, newUser); 
+                user = await repository.ModifyUser(id, newUser); 
             }
             catch (Exception e) // TODO: Change Exception type
             {
@@ -74,7 +74,7 @@ namespace CryptoZAPI.Controllers
             User user;
             try
             {
-                user = repository.GetOneUser(id);
+                user = await repository.GetOneUser(id);
             }
             catch (ArgumentNullException e)
             {
