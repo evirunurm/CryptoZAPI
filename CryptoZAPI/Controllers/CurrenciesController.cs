@@ -11,18 +11,15 @@ namespace CryptoZAPI.Controllers {
     [ApiController]
     public class CurrenciesController : ControllerBase {
 
-        // Logging
-        private readonly ILogger<CurrenciesController> _logger;
         private readonly INomics nomics;
         private readonly IRepository repository;
         private DateTime lastRequested;
 
         // Mapper
         private readonly IMapper _mapper;
+        // Logging
+        private readonly ILogger<CurrenciesController> _logger;
 
-        // Optimización  
-        //private readonly int lastRequestMinuteOffset = 10;
-        
 
         public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository, IMapper mapper) {
             this._logger = logger;
@@ -30,8 +27,6 @@ namespace CryptoZAPI.Controllers {
             this.repository = repository;
             this.lastRequested = DateTime.Now.Date;
             this._mapper = mapper;  
-
-            //
 
         }
 
@@ -42,10 +37,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
 
-            // Optimización            
-            //if (DateTime.Now.CompareTo(lastRequested) > 0) { 
-
-              bool updated = await UpdateDatabase();
+            bool updated = await UpdateDatabase();
 
             if (!lastRequested.Equals(DateTime.Now.Date)) {
                 updated = await UpdateDatabase();

@@ -8,17 +8,17 @@ namespace Repo {
         // All return types might have to be nullable, in case there's a captured Exception.
         // Currencies
         // GET
-        List<Currency> GetAllCurrencies();
-        Currency? GetOneCurrency(int id);
+        Task<List<Currency>> GetAllCurrencies();
+        Task<Currency?> GetOneCurrency(int id);
         // PUT
-        Currency ModifyCurrency(int id, Currency currency);
+        Task<Currency> ModifyCurrency(int id, Currency currency);
         // POST
-        Currency CreateCurrency(Currency currency);
+        Task<Currency> CreateCurrency(Currency currency);
 
 
         // Users
         // GET
-        User GetOneUser(int id);
+        Task<User> GetOneUser(int id);
         // POST
         User CreateUser(User user);
         // PUT
