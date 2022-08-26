@@ -172,17 +172,19 @@ namespace CryptoZAPI.Controllers {
         private async Task<bool> UpdateDatabase() {
             try {
 
-                List<CurrencyDto> CurrenciesDtoToAdd = await nomics.getCurrencies();
+                List<CurrencyDto> NomicsCurrencies = await nomics.getCurrencies();
 
-                List<CurrencyForCreationDto> CurrenciesToAdd = _mapper.Map<List<CurrencyForCreationDto>>(CurrenciesDtoToAdd);
+                List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
 
-                int count = 0;
-                foreach (CurrencyForCreationDto c in CurrenciesToAdd) {
-                    await repository.CreateCurrency(_mapper.Map<Currency>(c));
-                    count++;
-                    if (count == 10)
-                        break;
-                }
+                List<Currency> a = await repository.CreateMultipleCurrencies(CurrenciesToAdd);             
+                
+                //int count = 0;
+                //foreach (CurrencyForCreationDto c in CurrenciesToAdd) {
+                //    await repository.CreateCurrency(_mapper.Map<Currency>(c));
+                //    count++;
+                //    if (count == 10)
+                //        break;
+                //}
                 
 
                 // TODO: Update currencies in database. + await 

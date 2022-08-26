@@ -16,6 +16,7 @@ namespace Repo {
         Task<Currency> ModifyCurrency(int id, Currency currency);
         // POST
         Task<Currency> CreateCurrency(Currency currency);
+        Task<List<Currency>> CreateMultipleCurrencies(List<Currency> currencies);
 
 
         // Users
@@ -63,8 +64,8 @@ namespace Repo {
                 throw new ArgumentNullException("No existe la moneda parameter");
 
             return currency;
-        }
-
+        }     
+        
         public async Task<Currency> CreateCurrency(Currency currency) {
 			var old_currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == currency.Code);
 
@@ -81,6 +82,21 @@ namespace Repo {
 
 			return old_currency;
 		}
+
+        // TODO
+        public async Task<List<Currency>> CreateMultipleCurrencies(List<Currency> currencies) {
+
+            List<Currency> newCurrencies = currencies.Where(x => !_context.Currencies.Any(y => y.Code == x.Code)).ToList();
+            List<Currency> oldCurrencies = currencies.Where(x => _context.Currencies.Any(y => y.Code == x.Code)).ToList();
+
+            int i = 0;
+            await _context.Currencies.AddRangeAsync(newCurrencies);
+
+
+            await saveDB();
+
+            return await _context.Currencies.ToListAsync();
+        }
 
         public async Task<Currency> ModifyCurrency(int id, Currency currency)
         {
@@ -189,5 +205,7 @@ namespace Repo {
 		private async Task saveDB() {
 			await _context.SaveChangesAsync();
 		}
-	}
+
+   
+    }
 }

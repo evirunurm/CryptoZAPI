@@ -9,13 +9,12 @@ public class TestHistoryController
         var repositoryService = new Mock<IRepository>();
         var loggerService = new Mock<ILogger>();
 
-        Guid guid = Guid.NewGuid();
 
         //repositoryService.Setup(_ => _.GetAllHistoriesForUser(guid,1)).Returns(HistoryMockData.GetAll());
         var sut = new HistoryController(null, repositoryService.Object, null);
 
         /// Act
-        var result = await sut.GetAll(guid, 1);
+        var result = await sut.GetAll(1, 1);
         var okObjectResult = result as OkObjectResult;
 
         // /// Assert
@@ -29,13 +28,11 @@ public class TestHistoryController
         var repositoryService = new Mock<IRepository>();
         var loggerService = new Mock<ILogger>();
 
-        Guid guid = Guid.NewGuid();
-
         //repositoryService.Setup(service => service.GetAllHistoriesForUser(guid, 1)).Returns(HistoryMockData.GetEmpty());
         var sut = new HistoryController(null, repositoryService.Object, null);
 
         /// Act
-        var result = await sut.GetAll(guid,1);
+        var result = await sut.GetAll(1,1);
         var noContenetResult = result as NoContentResult;
 
         /// Assert
