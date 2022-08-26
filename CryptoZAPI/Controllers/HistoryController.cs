@@ -27,18 +27,21 @@ namespace CryptoZAPI.Controllers
         }
 
         // GET
-        [HttpGet("{idUser}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<History>))]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HistoryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll(int idUser, int limit)
+        public async Task<IActionResult> GetAll(string emailUser, int limit = 0)
         {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
-            List<History>? histories;
+            List<HistoryForViewDto> histories;
+
 
             try
             {
-                histories = await repository.GetAllHistoriesForUser(idUser, limit);
+                int userId = (await repository.GetUserByEmail(emailUser)).Id;
+                histories = _mapper.Map<List<HistoryForViewDto>>(await repository.GetAllHistoriesForUser(userId, limit));
+
                 if (histories.Count == 0) { 
                     return NoContent();
                 }
@@ -58,15 +61,9 @@ namespace CryptoZAPI.Controllers
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Post([FromBody] HistoryForCreationDto history)
         {
-
-
             try
             {
                 History historyMapped = _mapper.Map<History>(history);
-
-       
-
-
 
                 historyMapped.Origin = await repository.GetOneCurrency(history.OriginCode);
                 historyMapped.Destination = await repository.GetOneCurrency(history.DestinationCode);
@@ -78,7 +75,6 @@ namespace CryptoZAPI.Controllers
 
                 return Ok(historyDto);
 
-               
             }
             catch (Exception e) // TODO: Change Exception type
             {

@@ -9,11 +9,11 @@ namespace Models.DTO {
     public class HistoryForViewDto {
 
         [Required]
-        public string Origin { get; set; }
+        public string OriginCode { get; set; }
         [Required]
         public int UserId { get; set; }
         [Required]
-        public string Destination { get; set; }
+        public string DestinationCode { get; set; }
         [Required]
         public double Value { get; set; }
         [Required]

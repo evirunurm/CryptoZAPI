@@ -25,12 +25,20 @@ namespace Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+			/*
             modelBuilder.Entity<User>()
                .HasMany(u => u.Histories)
                .WithOne(h => h.User)
                .HasForeignKey(h => h.UserId);
+			*/
 
-			modelBuilder.Entity<History>()
+            modelBuilder.Entity<History>()
+                .HasOne(h => h.User)
+                .WithMany(u => u.Histories)
+                .HasForeignKey(h => h.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<History>()
 				.HasOne(h => h.Origin)
 				.WithMany(c => c.HistoriesOrigin)
 				.HasForeignKey(h => h.OriginId)

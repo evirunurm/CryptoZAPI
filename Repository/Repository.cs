@@ -10,8 +10,8 @@ namespace Repo {
         // Currencies
         // GET
         Task<List<Currency>> GetAllCurrencies();
-        Task<Currency?> GetOneCurrency(int id);
-         Task<Currency?> GetOneCurrency(string code);
+        Task<Currency> GetOneCurrency(int id);
+        Task<Currency> GetOneCurrency(string code);
         // PUT
         Task<Currency> ModifyCurrency(int id, Currency currency);
         // POST
@@ -21,7 +21,9 @@ namespace Repo {
 
         // Users
         // GET
-        Task<User> GetOneUser(int id);
+        Task<User> GetUserById(int id);
+
+        Task<User> GetUserByEmail(string email);
         // POST
         Task<User> CreateUser(User user);
         // PUT
@@ -30,7 +32,7 @@ namespace Repo {
 
 		// Histories
 		// GET
-		Task<List<History>> GetAllHistoriesForUser(int userId, int? limit);
+		Task<List<History>> GetAllHistoriesForUser(int userId, int limit);
 		// POST
 		Task<History> CreateHistory(History history);
 
@@ -50,7 +52,7 @@ namespace Repo {
             return currencies;
         }
 
-        public async Task<Currency?> GetOneCurrency(int id)
+        public async Task<Currency> GetOneCurrency(int id)
         {
             Currency currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == id) ??
                 throw new ArgumentNullException("No existe la moneda parameter");
@@ -58,7 +60,7 @@ namespace Repo {
             return currency;
         }
 
-        public async Task<Currency?> GetOneCurrency(string code)
+        public async Task<Currency> GetOneCurrency(string code)
         {
             Currency currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code) ??
                 throw new ArgumentNullException("No existe la moneda parameter");
@@ -122,13 +124,13 @@ namespace Repo {
 
 
         // HISTORY
-        public async Task<List<History>> GetAllHistoriesForUser(int userId, int? limit)
+        public async Task<List<History>> GetAllHistoriesForUser(int userId, int limit)
         {
             // TODO: Refactor
 
-            if (limit != null)
+            if (limit != 0)
             {
-                return await _context.Histories
+            return await _context.Histories
                 .Where(h => h.UserId == userId)
                 .OrderByDescending(h => h.Date)
                 .Take((int) limit)
@@ -159,9 +161,14 @@ namespace Repo {
 
 
         // USER
-        public async Task<User> GetOneUser(int id)
+        public async Task<User> GetUserById(int id)
         {
             return await _context.Users.FirstAsync(u => u.Id == id); // Throws exception in case it's not found
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _context.Users.FirstAsync(u => u.Email == email); // Throws exception in case it's not found
         }
 
         public async Task<User> CreateUser(User user)

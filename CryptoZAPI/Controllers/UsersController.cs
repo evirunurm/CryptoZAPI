@@ -78,7 +78,7 @@ namespace CryptoZAPI.Controllers
 			User user;
 			try
 			{
-				user = await repository.GetOneUser(id);
+				user = await repository.GetUserById(id);
 			}
 			catch (ArgumentNullException e)
 			{
