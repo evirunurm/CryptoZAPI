@@ -37,7 +37,7 @@ namespace CryptoZAPI.Controllers {
 
         // GET currencies
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Currency>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
@@ -47,15 +47,18 @@ namespace CryptoZAPI.Controllers {
 
               bool updated = await UpdateDatabase();
 
-            if (!lastRequested.Equals(DateTime.Now.Date)) {
-                updated = await UpdateDatabase();
-                if (!updated) {
-                    return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
-                }
-            }
+            // if (!lastRequested.Equals(DateTime.Now.Date)) {
+            //     updated = await UpdateDatabase();
+            //     if (!updated) {
+            //         return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
+            //     }
+            // }
 
             try {
-                List<CurrencyForCreationDto> Currencies = _mapper.Map<List<CurrencyForCreationDto>>(repository.GetAllCurrencies());
+
+
+
+                List<CurrencyForViewDto> Currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAllCurrencies());
                 return Ok(Currencies);
             }
             catch (Exception e) // TODO: Change Exception type
@@ -122,11 +125,11 @@ namespace CryptoZAPI.Controllers {
 
 
         // GET currencies/{id}
-        [HttpGet("{id}")]
+        [HttpGet("{code}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindOne(int id) {
+        public async Task<IActionResult> FindOne(string code) {
             if (!lastRequested.Equals(DateTime.Now.Date)) {
                 bool updated = await UpdateDatabase();
                 if (!updated) {
@@ -136,7 +139,7 @@ namespace CryptoZAPI.Controllers {
 
             // Pensar como hacer para que devuelva una excepcion en caso de que no exista la moneda de forma "más elegante"
             try {
-                CurrencyForCreationDto currency = _mapper.Map<CurrencyForCreationDto>(repository.GetOneCurrency(id));                
+                CurrencyForCreationDto currency = _mapper.Map<CurrencyForCreationDto>(await repository.GetOneCurrency(code));                
                 return Ok(currency);
             }
             catch (ArgumentNullException e) {
@@ -186,7 +189,7 @@ namespace CryptoZAPI.Controllers {
 
                 List<Currency> a = await repository.CreateMultipleCurrencies(CurrenciesToAdd);             
                 
-                //int count = 0;
+              //int count = 0;
                 //foreach (CurrencyForCreationDto c in CurrenciesToAdd) {
                 //    await repository.CreateCurrency(_mapper.Map<Currency>(c));
                 //    count++;
