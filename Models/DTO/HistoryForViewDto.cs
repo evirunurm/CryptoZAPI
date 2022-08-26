@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Models.DTO {
-    public class HistoryDto {
+    public class HistoryForViewDto {
 
         [Required]
         public string Origin { get; set; }

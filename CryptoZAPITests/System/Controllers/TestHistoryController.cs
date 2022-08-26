@@ -2,6 +2,7 @@
 
 public class TestHistoryController
 {
+    /*
     [Fact]
     public async void GetAll_ShouldReturn200Status()
     {
@@ -41,7 +42,7 @@ public class TestHistoryController
         // Makes sure the repository is called only once 
         // repositoryService.Verify(service => service.GetAllCurrencies(), Times.Exactly(1));
     }
-
+    */
 
 }
 

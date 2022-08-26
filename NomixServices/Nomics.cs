@@ -7,7 +7,7 @@ using Models.DTO;
 namespace NomixServices {
     public interface INomics
     {
-        Task<List<CurrencyDto>> getCurrencies();
+        Task<List<CurrencyForViewDto>> getCurrencies();
     }
 
     public class Nomics : INomics
@@ -21,7 +21,7 @@ namespace NomixServices {
             this.configuration = configuration; 
         }
 
-        public async Task<List<CurrencyDto>> getCurrencies()
+        public async Task<List<CurrencyForViewDto>> getCurrencies()
         {
             string ApiKey = configuration["environmentVariables:ApiKey"];
 
@@ -29,7 +29,7 @@ namespace NomixServices {
             var info = await result.Content.ReadAsStringAsync();
 
             // TODO: Check null
-            List<CurrencyDto> currencies = JsonConvert.DeserializeObject<List<CurrencyDto>>(info);
+            List<CurrencyForViewDto> currencies = JsonConvert.DeserializeObject<List<CurrencyForViewDto>>(info);
 
             return currencies;
         }
