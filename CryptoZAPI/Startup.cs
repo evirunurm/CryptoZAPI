@@ -9,7 +9,7 @@ public static class Startup {
 
         // AutoMapper
         //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-        builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile));
+        builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile));
 
         // Controllers
         builder.Services.AddControllers();

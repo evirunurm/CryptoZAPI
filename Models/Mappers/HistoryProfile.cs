@@ -12,7 +12,7 @@ namespace Models.Mappers {
         public HistoryProfile() {
 
             // <Origen, Destino>
-            CreateMap<HistoryDto, History>()
+            CreateMap<HistoryForViewDto, History>()
                 .ForMember(dest => dest.Id,
                             opt => opt.Ignore())            
                 .ReverseMap();
@@ -22,7 +22,7 @@ namespace Models.Mappers {
                             opt => opt.Ignore());
 
 
-            CreateMap<History, HistoryDto>()
+            CreateMap<History, HistoryForViewDto>()
                 .ForMember(dest => dest.Origin, 
                             opt => opt.MapFrom(src => src.Origin.Code))
             .ForMember(dest => dest.Destination,

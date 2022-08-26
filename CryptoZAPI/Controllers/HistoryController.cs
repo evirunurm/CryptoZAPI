@@ -73,7 +73,7 @@ namespace CryptoZAPI.Controllers
 
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
 
-                HistoryDto historyDto = _mapper.Map<HistoryDto>(await repository.CreateHistory(historyMapped));
+                HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.CreateHistory(historyMapped));
 
 
                 return Ok(historyDto);

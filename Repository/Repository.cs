@@ -24,7 +24,7 @@ namespace Repo {
         // POST
         Task<User> CreateUser(User user);
         // PUT
-        Task<User> ModifyUser(int id, User user);
+        Task<User> ModifyUser(UserForUpdateDto user);
 
 
 		// Histories
@@ -65,7 +65,8 @@ namespace Repo {
             return currency;
         }
 
-        public async Task<Currency> CreateCurrency(Currency currency) {
+        public async Task<Currency> CreateCurrency(Currency currency)
+        {
 			var old_currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == currency.Code);
 
 			if (old_currency == null) {
@@ -148,7 +149,8 @@ namespace Repo {
             return await _context.Users.FirstAsync(u => u.Id == id); // Throws exception in case it's not found
         }
 
-        public async Task<User> CreateUser(User user) {
+        public async Task<User> CreateUser(User user)
+        {
             try
             {
                 // Validate user doesn't exist
@@ -164,7 +166,8 @@ namespace Repo {
 
                 // Save user
                 await _context.Users.AddAsync(user);
-                _context.SaveChanges();
+
+                await saveDB();
 
                 return user;
             }
@@ -176,17 +179,19 @@ namespace Repo {
             
         }
 
-		public async Task<User> ModifyUser(int id, User user) {
-            // throw new NotImplementedException();
-
-            // TODO: finish
-            _context.Users.Update(user);
+		public async Task<User> ModifyUser(UserForUpdateDto newUser) 
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
+            user.Name = newUser.Name ?? user.Name;
+            // TODO: BCrypt verify password w/ salt 
+            await saveDB();
             return user;
         }
 
 
         // DB
-		private async Task saveDB() {
+		private async Task saveDB()
+        {
 			await _context.SaveChangesAsync();
 		}
 	}

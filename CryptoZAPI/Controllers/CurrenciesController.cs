@@ -11,15 +11,18 @@ namespace CryptoZAPI.Controllers {
     [ApiController]
     public class CurrenciesController : ControllerBase {
 
+        // Logging
+        private readonly ILogger<CurrenciesController> _logger;
         private readonly INomics nomics;
         private readonly IRepository repository;
         private DateTime lastRequested;
 
         // Mapper
         private readonly IMapper _mapper;
-        // Logging
-        private readonly ILogger<CurrenciesController> _logger;
 
+        // Optimización  
+        //private readonly int lastRequestMinuteOffset = 10;
+        
 
         public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository, IMapper mapper) {
             this._logger = logger;
@@ -27,6 +30,8 @@ namespace CryptoZAPI.Controllers {
             this.repository = repository;
             this.lastRequested = DateTime.Now.Date;
             this._mapper = mapper;  
+
+            //
 
         }
 
@@ -37,7 +42,10 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
 
-            bool updated = await UpdateDatabase();
+            // Optimización            
+            //if (DateTime.Now.CompareTo(lastRequested) > 0) { 
+
+              bool updated = await UpdateDatabase();
 
             if (!lastRequested.Equals(DateTime.Now.Date)) {
                 updated = await UpdateDatabase();
@@ -47,7 +55,7 @@ namespace CryptoZAPI.Controllers {
             }
 
             try {
-                List<CurrencyDto> Currencies = _mapper.Map<List<CurrencyDto>>(await repository.GetAllCurrencies());
+                List<CurrencyForViewDto> Currencies = _mapper.Map<List<CurrencyForViewDto>>(repository.GetAllCurrencies());
                 return Ok(Currencies);
             }
             catch (Exception e) // TODO: Change Exception type
@@ -62,12 +70,12 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(double))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save) { 
+        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save) {
             // conversion = result
             double result = 0;
             
             // if (save) pues guarda history
-            //		Histories h;
+            //		History h;
             // if catch --> Forbidden();
 
             return Ok(result);
@@ -94,14 +102,14 @@ namespace CryptoZAPI.Controllers {
 
         
 		[HttpPut]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(¿Histories?))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(¿History?))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
 		public async Task<IActionResult> SaveConversion(string userId, string codeOrigin, string codeDestination, double converted_value) {
 			// conversion = result
 
-			Histories h;
+			History h;
 
             if (userId no existe) -> return 403
 			
@@ -128,7 +136,7 @@ namespace CryptoZAPI.Controllers {
 
             // Pensar como hacer para que devuelva una excepcion en caso de que no exista la moneda de forma "más elegante"
             try {
-                CurrencyDto currency = _mapper.Map<CurrencyDto>(repository.GetOneCurrency(id));                
+                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(repository.GetOneCurrency(id));                
                 return Ok(currency);
             }
             catch (ArgumentNullException e) {
@@ -172,7 +180,7 @@ namespace CryptoZAPI.Controllers {
         private async Task<bool> UpdateDatabase() {
             try {
 
-                List<CurrencyDto> CurrenciesDtoToAdd = await nomics.getCurrencies();
+                List<CurrencyForViewDto> CurrenciesDtoToAdd = await nomics.getCurrencies();
 
                 List<CurrencyForCreationDto> CurrenciesToAdd = _mapper.Map<List<CurrencyForCreationDto>>(CurrenciesDtoToAdd);
 
