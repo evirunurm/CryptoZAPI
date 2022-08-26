@@ -12,7 +12,7 @@ namespace Models.Mappers {
         public CurrencyProfile() {
 
             // <Origen, Destino>
-            CreateMap<CurrencyForViewDto, Currency>()
+            CreateMap<CurrencyForCreationDto, Currency>()
                 .ForMember(dest => dest.Id,
                             opt => opt.Ignore()) // TODO: En lugar  de Ignorar, calcular/buscar el Id que le corresponde (o ignorarlo como ahora)
                 .ForMember(dest => dest.Code,
@@ -24,7 +24,7 @@ namespace Models.Mappers {
                 .ReverseMap();
 
             
-            CreateMap<CurrencyForViewDto, CurrencyForCreationDto>()
+            CreateMap<CurrencyForCreationDto, CurrencyForViewDto>()
               .ForMember(dest => dest.Code,
                           opt => opt.MapFrom(src => src.Id))
               .ForMember(dest => dest.PriceDate,
@@ -34,7 +34,7 @@ namespace Models.Mappers {
               .ReverseMap();
 
             // Quizá no haga falta ¿?
-            CreateMap<CurrencyForCreationDto, Currency>()
+            CreateMap<CurrencyForViewDto, Currency>()
                .ForMember(dest => dest.Id,
                            opt => opt.Ignore()) // TODO: En lugar  de Ignorar, calcular/buscar el Id que le corresponde (o ignorarlo como ahora)              
                .ReverseMap();

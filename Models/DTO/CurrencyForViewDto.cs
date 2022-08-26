@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 namespace Models.DTO {
-    public class CurrencyForViewDto {
+    public class CurrencyForCreationDto {
         [Required]
         [Index(IsUnique = true)]
         [MaxLength(10)]

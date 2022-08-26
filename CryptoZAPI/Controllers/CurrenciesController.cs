@@ -55,7 +55,7 @@ namespace CryptoZAPI.Controllers {
             }
 
             try {
-                List<CurrencyForViewDto> Currencies = _mapper.Map<List<CurrencyForViewDto>>(repository.GetAllCurrencies());
+                List<CurrencyForCreationDto> Currencies = _mapper.Map<List<CurrencyForCreationDto>>(repository.GetAllCurrencies());
                 return Ok(Currencies);
             }
             catch (Exception e) // TODO: Change Exception type
@@ -136,7 +136,7 @@ namespace CryptoZAPI.Controllers {
 
             // Pensar como hacer para que devuelva una excepcion en caso de que no exista la moneda de forma "más elegante"
             try {
-                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(repository.GetOneCurrency(id));                
+                CurrencyForCreationDto currency = _mapper.Map<CurrencyForCreationDto>(repository.GetOneCurrency(id));                
                 return Ok(currency);
             }
             catch (ArgumentNullException e) {
@@ -180,7 +180,7 @@ namespace CryptoZAPI.Controllers {
         private async Task<bool> UpdateDatabase() {
             try {
 
-                List<CurrencyDto> NomicsCurrencies = await nomics.getCurrencies();
+                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCurrencies();
 
                 List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
 

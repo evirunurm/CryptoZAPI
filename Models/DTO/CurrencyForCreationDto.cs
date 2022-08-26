@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 namespace Models.DTO {
-    public class CurrencyForCreationDto {
+    public class CurrencyForViewDto {
         [Required(ErrorMessage = "You should provide a Code value.")]
         [Index(IsUnique = true)]
         [MaxLength(10)]
