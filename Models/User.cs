@@ -1,6 +1,7 @@
 ﻿using CryptoZAPI.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models
 {
@@ -13,12 +14,14 @@ namespace Models
         public string Name { get; set; }
 		[Required]
         [MaxLength(320)]
+        [Index(IsUnique = true)]
         public string Email { get; set; }
 		[Required]
         [MinLength(8)]
         public string Password { get; set; }
         public string Salt { get; set; }
 
+        // Relations
         public List<History> Histories { get; set; }
         
     }

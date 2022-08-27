@@ -8,24 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data
-{
-	public class CryptoZContext : DbContext
-	{
-		public DbSet<Currency> Currencies { get; set; }
-		public DbSet<History> Histories { get; set; }
-		public DbSet<User> Users { get; set; }
+namespace Data {
+    public class CryptoZContext : DbContext {
+        public DbSet<Currency> Currencies { get; set; }
+        public DbSet<History> Histories { get; set; }
+        public DbSet<User> Users { get; set; }
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		{
-			optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
-	
-		}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
+        }
 
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-			/*
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            /*
             modelBuilder.Entity<User>()
                .HasMany(u => u.Histories)
                .WithOne(h => h.User)
@@ -39,16 +33,16 @@ namespace Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<History>()
-				.HasOne(h => h.Origin)
-				.WithMany(c => c.HistoriesOrigin)
-				.HasForeignKey(h => h.OriginId)
-				.OnDelete(DeleteBehavior.NoAction);
+                .HasOne(h => h.Origin)
+                .WithMany(c => c.HistoriesOrigin)
+                .HasForeignKey(h => h.OriginId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-			modelBuilder.Entity<History>()
-				.HasOne(h => h.Destination)
-				.WithMany(c => c.HistoriesDestination)
-				.HasForeignKey(h => h.DestinationId)
-				.OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<History>()
+                .HasOne(h => h.Destination)
+                .WithMany(c => c.HistoriesDestination)
+                .HasForeignKey(h => h.DestinationId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
-	}
+    }
 }

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models.DTO {
     public class UserForCreationDto {
-
         [Required]
         [MaxLength(64)]
         public string Name { get; set; }

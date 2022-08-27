@@ -7,19 +7,12 @@ using System.Text;
 
 namespace Models.DTO {
     public class HistoryForCreationDto {
-
-
         [Required]
         public string OriginCode { get; set; }
-
-        public int? UserId { get; set; }
-
-       [Required]
+        public string? UserEmail { get; set; }
+        [Required]
         public string DestinationCode { get; set; }
-    
         [Required]
         public double Value { get; set; }
-       
-     
     }
 }

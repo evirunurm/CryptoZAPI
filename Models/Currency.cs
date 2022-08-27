@@ -23,6 +23,7 @@ namespace CryptoZAPI.Models
         public DateTime PriceDate { get; set; }
         public string LogoUrl { get; set; }  
         
+        // Relations
         public List<History> HistoriesOrigin{ get; set; }
         public List<History> HistoriesDestination { get; set; }
 

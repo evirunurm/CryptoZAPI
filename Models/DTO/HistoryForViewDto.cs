@@ -7,11 +7,8 @@ using System.Text;
 
 namespace Models.DTO {
     public class HistoryForViewDto {
-
         [Required]
-        public string OriginCode { get; set; }
-        [Required]
-        public int UserId { get; set; }
+        public string OriginCode { get; set; }       
         [Required]
         public string DestinationCode { get; set; }
         [Required]
@@ -20,8 +17,5 @@ namespace Models.DTO {
         public double Result { get; set; }
         [Required]
         public DateTime Date { get; set; }
-
-
-
     }
 }

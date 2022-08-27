@@ -22,6 +22,7 @@ namespace Utils
                 Log.Error(e, e.Message);
                 Console.WriteLine(e.Message);
             }
+            // ¿? ¿Por que esté return?
             return Math.Round(value, 3);
         }
     }

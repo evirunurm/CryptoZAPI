@@ -19,9 +19,5 @@ namespace Models.DTO {
         [Required]
         public DateTime price_date { get; set; }
         public string? logo_url { get; set; }
-
-
-
     }
-
 }

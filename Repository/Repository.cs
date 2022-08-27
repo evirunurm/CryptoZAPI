@@ -5,87 +5,83 @@ using Models;
 using Models.DTO;
 
 namespace Repo {
+
     public interface IRepository {
-        // All return types might have to be nullable, in case there's a captured Exception.
-        // Currencies
-        // GET
+        // -- Currencies --
+        // ----- GET -----
         Task<List<Currency>> GetAllCurrencies();
-        Task<Currency> GetOneCurrency(int id);
+        Task<Currency> GetOneCurrency(int id); // BORRAR ¿?
         Task<Currency> GetOneCurrency(string code);
-        // PUT
-        Task<Currency> ModifyCurrency(int id, Currency currency);
-        // POST
+        // ----- PUT -----
+        Task<Currency> ModifyCurrency(int id, Currency currency); // BORRAR ¿?
+        // ----- POST -----
         Task<Currency> CreateCurrency(Currency currency);
         Task<List<Currency>> CreateMultipleCurrencies(List<Currency> currencies);
 
 
-        // Users
-        // GET
-        Task<User> GetUserById(int id);
-
+        // -- Users --
+        // ----- GET -----
+        Task<User> GetUserById(int id); // BORRAR ¿?
         Task<User> GetUserByEmail(string email);
-        // POST
+        // ----- POST -----
         Task<User> CreateUser(User user);
-        // PUT
+        // ----- PUT -----
         Task<User> ModifyUser(UserForUpdateDto user);
 
 
-		// Histories
-		// GET
-		Task<List<History>> GetAllHistoriesForUser(int userId, int limit);
-		// POST
-		Task<History> CreateHistory(History history);
+        // -- Histories
+        // ----- GET -----
+        Task<List<History>> GetAllHistoriesForUser(int userId, int limit); // BORRAR ¿?       
+        Task<List<History>> GetAllHistoriesForUser(string userEmail, int limit);
+        // ----- POST -----
+        Task<History> CreateHistory(History history);
+    }
+
+    public class Repository : IRepository {
+
+        CryptoZContext _context = new CryptoZContext();
 
 
-	}
+        // -- Currencies --
+        // ----- GET -----
 
-	public class Repository : IRepository {
-
-		CryptoZContext _context = new CryptoZContext();
-
-
-        // CURRENCY
-        public async Task<List<Currency>> GetAllCurrencies()
-        {
+        public async Task<List<Currency>> GetAllCurrencies() {
             var currencies = await _context.Currencies.ToListAsync() ?? throw new ArgumentNullException();
-
             return currencies;
         }
 
-        public async Task<Currency> GetOneCurrency(int id)
-        {
+        public async Task<Currency> GetOneCurrency(int id) {
             Currency currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == id) ??
                 throw new ArgumentNullException("No existe la moneda parameter");
 
             return currency;
         }
 
-        public async Task<Currency> GetOneCurrency(string code)
-        {
+        public async Task<Currency> GetOneCurrency(string code) {
             Currency currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code) ??
                 throw new ArgumentNullException("No existe la moneda parameter");
 
             return currency;
-        }     
-        
+        }
+
+        // ----- POST -----
         public async Task<Currency> CreateCurrency(Currency currency) {
-			var old_currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == currency.Code);
+            var old_currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == currency.Code);
 
-			if (old_currency == null) {
-				await _context.Currencies.AddAsync(currency);
+            if (old_currency == null) {
+                await _context.Currencies.AddAsync(currency);
 
-				await saveDB();
-				old_currency = currency;
-			}
-			else {
+                await saveDB();
+                old_currency = currency;
+            }
+            else {
                 await ModifyCurrency(old_currency.Id, currency);
-			}
+            }
 
 
-			return old_currency;
-		}
+            return old_currency;
+        }
 
-        // TODO
         public async Task<List<Currency>> CreateMultipleCurrencies(List<Currency> currencies) {
 
             List<Currency> newCurrencies = currencies.Where(x => !_context.Currencies.Any(y => y.Code == x.Code)).ToList();
@@ -93,21 +89,20 @@ namespace Repo {
 
             int i = 0;
             await _context.Currencies.AddRangeAsync(newCurrencies);
-
+            // TODO UPDATE
 
             await saveDB();
 
             return await _context.Currencies.ToListAsync();
         }
 
-        public async Task<Currency> ModifyCurrency(int id, Currency currency)
-        {
+        // ----- PUT -----
+        public async Task<Currency> ModifyCurrency(int id, Currency currency) {
             // (Luis) Asumo que solamente se deben cambiar Name, Price, PriceDate y LogoUrl
 
             var old_currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Id == id);
 
-            if (old_currency == null)
-            {
+            if (old_currency == null) {
                 return null;
             }
 
@@ -123,18 +118,17 @@ namespace Repo {
 
 
 
-        // HISTORY
-        public async Task<List<History>> GetAllHistoriesForUser(int userId, int limit)
-        {
+        // -- History --
+        // ----- GET -----
+        public async Task<List<History>> GetAllHistoriesForUser(int userId, int limit) {
             // TODO: Refactor
 
-            if (limit != 0)
-            {
-            return await _context.Histories
-                .Where(h => h.UserId == userId)
-                .OrderByDescending(h => h.Date)
-                .Take((int) limit)
-                .ToListAsync();
+            if (limit != 0) {
+                return await _context.Histories
+                    .Where(h => h.UserId == userId)
+                    .OrderByDescending(h => h.Date)
+                    .Take((int)limit)
+                    .ToListAsync();
             }
 
             return await _context.Histories
@@ -143,43 +137,72 @@ namespace Repo {
                 .ToListAsync();
         }
 
-        public async Task<History> CreateHistory(History history) 
-        {
-            try{
-                history.Date = DateTime.Now;
-                await _context.Histories.AddAsync(history);
+        public async Task<List<History>> GetAllHistoriesForUser(string userEmail, int limit) {
 
+            try {
+                List<History> histories;
+
+                if (limit > 0) {
+                    histories = await _context.Histories
+                        .Where(h => h.User.Email == userEmail)
+                        .OrderByDescending(h => h.Date)
+                        .Take((int)limit)
+                        .ToListAsync();
+                }
+                else {
+                    histories = await _context.Histories
+                        .Where(h => h.User.Email == userEmail)
+                        .OrderByDescending(h => h.Date)
+                        .ToListAsync();
+                }
+                return histories;
+            }
+            catch (Exception e) {
+                throw;
+            }
+        }
+
+        // ----- POST -----
+        public async Task<History> CreateHistory(History history) {
+            try {
+                history.Date = DateTime.Now;
+
+                // Si no está logeado, no almacenar en la BBDD, devolver
+                // directamente
+                if (history.User == null) {
+                    return history;
+                }
+
+                await _context.Histories.AddAsync(history);
                 await saveDB();
                 return history;
             }
-            catch (Exception e)
-            {
-                throw new Exception();
+            catch (Exception e) {
+                throw;
             }
-		
-		}
+
+        }
 
 
-        // USER
-        public async Task<User> GetUserById(int id)
-        {
+        // -- User --
+        // ----- GET -----
+        public async Task<User> GetUserById(int id) {
             return await _context.Users.FirstAsync(u => u.Id == id); // Throws exception in case it's not found
         }
 
-        public async Task<User> GetUserByEmail(string email)
-        {
-            return await _context.Users.FirstAsync(u => u.Email == email); // Throws exception in case it's not found
+        public async Task<User> GetUserByEmail(string email) {
+            User user = await _context.Users.FirstAsync(u => u.Email == email); // Throws exception in case it's not found
+            return user;
         }
 
-        public async Task<User> CreateUser(User user)
-        {
-            try
-            {
-                // Validate user doesn't exist
-                if (_context.Users.Any(x => x.Email == user.Email))
-                {
-                    throw new Exception($"User with the email { user.Email } already exists");
+        // ----- POST -----
+        public async Task<User> CreateUser(User user) {
+            try {
+                // Validate user doesn't exist       
+                if (await _context.Users.AnyAsync(x => x.Email == user.Email)) {
+                    throw new Exception($"User with the email {user.Email} already exists");
                 }
+
                 // Here we should map userDto to User
 
                 // Hash password and generate salt
@@ -193,16 +216,15 @@ namespace Repo {
 
                 return user;
             }
-            catch (Exception e)
-            {
-                throw new Exception();
+            catch (Exception e) {
+                throw;
             }
 
-            
+
         }
 
-		public async Task<User> ModifyUser(UserForUpdateDto newUser) 
-        {
+        // ----- PUT -----
+        public async Task<User> ModifyUser(UserForUpdateDto newUser) {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == newUser.Email);
             user.Name = newUser.Name ?? user.Name;
             // TODO: BCrypt verify password w/ salt 
@@ -210,13 +232,11 @@ namespace Repo {
             return user;
         }
 
+        // -- Database --
+        // ------ Save -----
+        private async Task saveDB() {
+            await _context.SaveChangesAsync();
+        }
 
-        // DB
-		private async Task saveDB()
-        {
-			await _context.SaveChangesAsync();
-		}
-
-   
     }
 }

@@ -9,26 +9,19 @@ using System.Threading.Tasks;
 
 namespace Models.Mappers {
     public class HistoryProfile : Profile {
-        public HistoryProfile()
-        {
-
-            // <Origen, Destino>
-            // CreateMap<HistoryForViewDto, History>()
-            // .ForMember(dest => dest.Id,
-            // opt => opt.Ignore())            
-            // .ReverseMap();
-
+        public HistoryProfile() {
+            // Origen, Destino
             CreateMap<HistoryForCreationDto, History>()
                 .ForMember(dest => dest.Id,
-                            opt => opt.Ignore());
-
+                            opt => opt.Ignore())
+                .ReverseMap();
 
             CreateMap<History, HistoryForViewDto>()
-                .ForMember(dest => dest.OriginCode, 
+                .ForMember(dest => dest.OriginCode,
                             opt => opt.MapFrom(src => src.Origin.Name))
-            .ForMember(dest => dest.DestinationCode,
+                .ForMember(dest => dest.DestinationCode,
                             opt => opt.MapFrom(src => src.Destination.Name))
-            .ReverseMap();
+                .ReverseMap();
 
 
 

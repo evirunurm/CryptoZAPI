@@ -15,24 +15,17 @@ namespace CryptoZAPI.Controllers {
         private readonly ILogger<CurrenciesController> _logger;
         private readonly INomics nomics;
         private readonly IRepository repository;
-        private DateTime lastRequested;
 
         // Mapper
         private readonly IMapper _mapper;
 
-        // Optimización  
-        //private readonly int lastRequestMinuteOffset = 10;
-        
+
 
         public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository, IMapper mapper) {
             this._logger = logger;
             this.nomics = nomics;
             this.repository = repository;
-            this.lastRequested = DateTime.Now.Date;
-            this._mapper = mapper;  
-
-            //
-
+            this._mapper = mapper;
         }
 
         // GET currencies
@@ -42,24 +35,15 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
 
-            // Optimización            
-            //if (DateTime.Now.CompareTo(lastRequested) > 0) { 
+            IActionResult? actionResultUpdateDb = await UpdateDatabase();
 
-              bool updated = await UpdateDatabase();
-
-            // if (!lastRequested.Equals(DateTime.Now.Date)) {
-            //     updated = await UpdateDatabase();
-            //     if (!updated) {
-            //         return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
-            //     }
-            // }
+            if (actionResultUpdateDb != null) {
+                return actionResultUpdateDb;
+            }
 
             try {
-
-
-
-                List<CurrencyForViewDto> Currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAllCurrencies());
-                return Ok(Currencies);
+                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAllCurrencies());
+                return Ok(currencies);
             }
             catch (Exception e) // TODO: Change Exception type
             {
@@ -68,151 +52,60 @@ namespace CryptoZAPI.Controllers {
             }
         }
 
-        [HttpPost("/convert")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(double))]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(double))]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value, bool save) {
-            // conversion = result
-            double result = 0;
-            
-            // if (save) pues guarda history
-            //		History h;
-            // if catch --> Forbidden();
-
-            return Ok(result);
-
-
-            /*OPCION DOS
-			 * Desde el frontend llamar primero a GetConversion: se devuelve la conversion
-			 * Si está logeado y el check está seleccionado: llama a otra función PostHistory, que almacene en el historial
-			 */
-
-        }
-
-        /* Opción dos		 		 
-		 
-        [HttpPost("/convert")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(double))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetConversion(string codeOrigin, string codeDestination, double value) {
-            // conversion = result
-            double result = 0;  
-
-            return Ok(result);
-        }
-
-        
-		[HttpPut]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(¿History?))]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
-		public async Task<IActionResult> SaveConversion(string userId, string codeOrigin, string codeDestination, double converted_value) {
-			// conversion = result
-
-			History h;
-
-            if (userId no existe) -> return 403
-			
-            if (!SaveToDB()) -> return error_no_se_ha_podido_crear
-
-			return Ok(result);
-
-        }
-		*/
-
-
-        // GET currencies/{id}
+        // GET currencies/{code}
         [HttpGet("{code}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindOne(string code) {
-            if (!lastRequested.Equals(DateTime.Now.Date)) {
-                bool updated = await UpdateDatabase();
-                if (!updated) {
-                    return StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
-                }
+
+            IActionResult? actionResultUpdateDb = await UpdateDatabase();
+
+            if (actionResultUpdateDb != null) {
+                return actionResultUpdateDb;
             }
 
-            // Pensar como hacer para que devuelva una excepcion en caso de que no exista la moneda de forma "más elegante"
             try {
-                CurrencyForCreationDto currency = _mapper.Map<CurrencyForCreationDto>(await repository.GetOneCurrency(code));                
+                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(await repository.GetOneCurrency(code));
                 return Ok(currency);
             }
-            catch (ArgumentNullException e) {
+            catch (Exception e) {
                 Console.WriteLine(e.Message);
                 return NotFound();
             }
 
         }
 
-        // GET currencies/convert
-        [HttpGet("/convert")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetConversion(int id)
-        {
-            // TODO 
-            return null;
-        }
+        private async Task<IActionResult?> UpdateDatabase() {
 
-        // PUT
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Currency))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Put(int id, [FromBody] Currency c) {
-            Currency newCurrency = null;
+            IActionResult? actionResult = null;
+
             try {
-                newCurrency = await repository.ModifyCurrency(id, c);
-            }
-            catch (Exception e) // TODO: Change Exception type
-            {
-                Console.WriteLine(e.Message);
-                return NotFound();
-            }
-            // Cambiar name of Currency c where id == id
-            return Ok(newCurrency);
-        }
-
-
-
-        private async Task<bool> UpdateDatabase() {
-            try {
-
-                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCurrencies();
+                List<CurrencyForCreationDto>? NomicsCurrencies = await nomics.getCurrencies();
 
                 List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
+                await repository.CreateMultipleCurrencies(CurrenciesToAdd);
 
-                List<Currency> a = await repository.CreateMultipleCurrencies(CurrenciesToAdd);             
-                
-              //int count = 0;
-                //foreach (CurrencyForCreationDto c in CurrenciesToAdd) {
-                //    await repository.CreateCurrency(_mapper.Map<Currency>(c));
-                //    count++;
-                //    if (count == 10)
-                //        break;
-                //}
-                
-
-                // TODO: Update currencies in database. + await 
-
-
-                this.lastRequested = DateTime.Now.Date;
-
-                // Optimización
-                //this.lastRequested = DateTime.Now.Date.AddMinutes(lastRequestMinuteOffset);
-
-                return true;
+                // PROBLEMA (Una de los 2, posiblemente la 2 más que la 1):
+                //
+                // 1- Como el método es Async, no se cambia el nextRequest en la clase.
+                // Solo se cambia en la "instancia" que dura la llamada de está función.
+                //
+                // 2- El CurrenciesController solo existe durante la llamada del usuario
+                // por lo que no tenemos la "referencia" de cuando se ha hecho la ultima
+                // request, ya que, cada vez que se hace una llamada a la API, el CurrencyController
+                // que recibe dicha llamada es distinto del que había anteriormente.
+                //
+                // Posible solución:
+                // Crear una clase estática y que está se encargue de comprobar el tiempo
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Console.WriteLine(e.Message);
-                return false;
+                Console.WriteLine($"Excepción {e}");
+                actionResult = StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
             }
+
+            return actionResult;
         }
     }
 }
