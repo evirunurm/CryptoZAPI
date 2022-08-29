@@ -87,7 +87,6 @@ namespace Repo {
             List<Currency> newCurrencies = currencies.Where(x => !_context.Currencies.Any(y => y.Code == x.Code)).ToList();
             List<Currency> oldCurrencies = currencies.Where(x => _context.Currencies.Any(y => y.Code == x.Code)).ToList();
 
-            int i = 0;
             await _context.Currencies.AddRangeAsync(newCurrencies);
             // TODO UPDATE
 
