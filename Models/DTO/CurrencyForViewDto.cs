@@ -7,17 +7,18 @@ using System.Text.Json.Serialization;
 
 namespace Models.DTO {
     public class CurrencyForViewDto {
-        [Required]
+        [Required(ErrorMessage = "You should provide a Code value.")]
         [Index(IsUnique = true)]
         [MaxLength(10)]
-        public string Id { get; set; }
-        [Required]
+        public string Code { get; set; }
+        [Required(ErrorMessage = "You should provide a Name value.")]
         [MaxLength(25)]
         public string Name { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a Price.")]
         public double Price { get; set; }
-        [Required]
-        public DateTime price_date { get; set; }
-        public string? logo_url { get; set; }
+        [Required(ErrorMessage = "You should provide a Price Date value.")]
+        public DateTime PriceDate { get; set; }
+        public string? LogoUrl { get; set; }
     }
+
 }
