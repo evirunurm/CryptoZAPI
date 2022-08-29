@@ -1,4 +1,5 @@
 ﻿using CryptoZAPI.Models;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Models;
 // using Microsoft.Extensions.Configuration;
@@ -14,8 +15,14 @@ namespace Data {
         public DbSet<History> Histories { get; set; }
         public DbSet<User> Users { get; set; }
 
+        // DB Path
+        private string DbPath = $"DB\\SQLite.DB";
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
+
+            //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.UseSqlite($"Data Source={DbPath}");
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
