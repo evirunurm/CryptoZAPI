@@ -23,9 +23,18 @@ namespace NomixServices {
         }
 
         public async Task<List<CurrencyForCreationDto>?> getCurrencies()
-        {   
+        {
             // TODO 
             // Solucionar que getCurrencies solo haga una llamada cada X tiempo.
+            if (DateTime.Parse(this.configuration["LastUpdateNomics:date"]) >= DateTime.Now.Date )
+            {
+                throw new Exception();
+
+            }
+
+
+            this.configuration["LastUpdateNomics:date"] = DateTime.Now.Date.ToString();
+
             string apiKey = configuration["environmentVariables:ApiKey"];
 
             var result = await client.GetAsync($"currencies/ticker?key={apiKey}");
