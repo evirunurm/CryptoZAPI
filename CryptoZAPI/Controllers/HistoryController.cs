@@ -6,6 +6,7 @@ using Models;
 using Models.DTO;
 using Repo;
 using System.Collections.Generic;
+using System.Data.Entity;
 
 namespace CryptoZAPI.Controllers {
     [Route("history")]
@@ -14,13 +15,17 @@ namespace CryptoZAPI.Controllers {
 
         // Logging
         private readonly ILogger<HistoryController> _logger;
-        private readonly IRepositoryOld repository;
+        private readonly IRepository<User> repositoryUser;
+        private readonly IRepository<Currency> repositoryCurrency;
+        private readonly IRepository<History> repository;
         private readonly IMapper _mapper;
 
-        public HistoryController(ILogger<HistoryController> logger, IRepositoryOld repository, IMapper mapper) {
+        public HistoryController(ILogger<HistoryController> logger, IRepository<History> repositoryHistory, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
             _logger = logger;
-            this.repository = repository;
-            this._mapper = mapper;
+            this.repositoryUser = repositoryUser ?? throw new ArgumentNullException(nameof(repositoryUser));
+            this.repositoryCurrency = repositoryCurrency;
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         // GET
@@ -35,8 +40,17 @@ namespace CryptoZAPI.Controllers {
 
                 List<HistoryForViewDto> histories;
 
-                int userId = (await repository.GetUserByEmail(emailUser)).Id;
-                histories = _mapper.Map<List<HistoryForViewDto>>(await repository.GetAllHistoriesForUser(userId, limit));
+                var foundUsers = await repositoryUser.FindBy(u => u.Email == emailUser).ToListAsync();
+                if (foundUsers.Count == 0)
+                {
+                    NotFound();
+                } else if (foundUsers.Count > 1)
+                {
+                    // TODO: Error en el argumento
+                }
+
+                int userId = foundUsers[0].Id;
+                histories = _mapper.Map<List<HistoryForViewDto>>(( await repository.FindBy(h => h.UserId == userId).ToListAsync() ));
 
                 if (histories.Count == 0) {
                     return NoContent();
@@ -44,6 +58,16 @@ namespace CryptoZAPI.Controllers {
 
                 return Ok(histories);
 
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+            catch (OperationCanceledException e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (Exception e) // TODO: Change Exception type
             {
@@ -61,18 +85,44 @@ namespace CryptoZAPI.Controllers {
             try {
 
                 History historyMapped = _mapper.Map<History>(history);
-                historyMapped.Origin = await repository.GetOneCurrency(history.OriginCode);
-                historyMapped.Destination = await repository.GetOneCurrency(history.DestinationCode);
+
+                var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode).ToListAsync();
+                var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode).ToListAsync();
+
+                if (foundListCurrencyOrigin.Count == 0 || foundListCurrencyDestination.Count == 0)
+                {
+                   return NotFound(); // TODO: Edit
+                }
+
+                historyMapped.Origin = foundListCurrencyOrigin[0];
+                historyMapped.Destination = foundListCurrencyDestination[0];
+
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
 
                 if (history.UserEmail != "") {
-                    historyMapped.User = await repository.GetUserByEmail(history.UserEmail);
+
+                    var foundUsers = await repositoryUser.FindBy(u => u.Email == history.UserEmail).ToListAsync();
+                    if (foundUsers.Count == 0)
+                    {
+                        return NotFound(); // TODO: Edit
+                    }
+
+                    historyMapped.User = foundUsers[0];
                 }
 
-                HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.CreateHistory(historyMapped));
+                HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));
 
                 return Ok(historyDto);
-
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+            catch (OperationCanceledException e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (Exception e) // TODO: Change Exception type
             {

@@ -1,4 +1,5 @@
 ﻿using CryptoZAPI.Models;
+using Models;
 using Models.Mappers;
 using NomixServices;
 using Repo;
@@ -21,6 +22,8 @@ public static class Startup {
         // Singletons
         builder.Services.AddSingleton<INomics, Nomics>();
         builder.Services.AddSingleton<IRepositoryOld, RepositoryOld>();
+        builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
 
         // Nomics
         builder.Services.AddHttpClient<INomics, Nomics>(client => {

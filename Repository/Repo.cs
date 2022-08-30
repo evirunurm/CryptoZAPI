@@ -16,12 +16,13 @@ namespace Repo
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(int id);
 
-        Task<List<T>> FindBy(Expression<Func<T, bool>> expression);
+        // Must be IQueryable to do ToListAsync();
+        IQueryable<T> FindBy(Expression<Func<T, bool>> expression); // throws ArgumentNullException, OperationCanceledException
 
-        Task<T> Create(T o);
+        Task<T> Create(T o); // throws OperationCanceledException
 
 
-        Task CreateRange(IEnumerable<T> range);
+        Task CreateRange(IEnumerable<T> range); // throws OperationCanceledException
         Task<T> Update(T o, int id);
 
         Task SaveDB();
@@ -29,36 +30,38 @@ namespace Repo
     }
 
 
-    public class Repository<T> : IRepository<T>
+    public class Repository<T> : IRepository<T>, IDisposable
         where T : class
     {
         private readonly ILogger _logger;
         private DbContext _context;
         private DbSet<T> dbSet;
 
-        public Repository( DbContext context, ILogger logger)
+        public Repository(ILogger logger = null)
         {
-            _context = context;
+            _context = new CryptoZContext();
             _logger = logger;
             dbSet = _context.Set<T>();
         }
 
 
 
-        public async Task<T> Create(T o) // throws OperationCanceledException
+        public async Task<T> Create(T o) 
         {
             await dbSet.AddAsync(o);
             return o;
         }
 
-        public async Task CreateRange(IEnumerable<T> range) // throws OperationCanceledException
+        public async Task CreateRange(IEnumerable<T> range) 
         {
             await dbSet.AddRangeAsync(range);
         }
 
-        public async Task<List<T>> FindBy(Expression<Func<T, bool>> expression) // throws ArgumentNullException, OperationCanceledException
+
+
+        public IQueryable<T> FindBy(Expression<Func<T, bool>> expression) 
         {
-           return await dbSet.Where(expression).ToListAsync();
+           return dbSet.Where(expression);
         }
 
         public async Task<IEnumerable<T>> GetAll() // throws ArgumentNullException, OperationCanceledException
@@ -82,6 +85,24 @@ namespace Repo
             var entity = await GetById(id);
             _context.Entry(entity).CurrentValues.SetValues(o);
             return o;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_context != null)
+                {
+                    _context.Dispose();
+                    _context = null; // TODO: Check this
+                }
+            }
         }
 
     }

@@ -5,6 +5,7 @@ using Models.DTO;
 using Models.Mappers;
 using NomixServices;
 using Repo;
+using System.Data.Entity;
 
 namespace CryptoZAPI.Controllers {
     [Route("currencies")]
@@ -14,18 +15,18 @@ namespace CryptoZAPI.Controllers {
         // Logging
         private readonly ILogger<CurrenciesController> _logger;
         private readonly INomics nomics;
-        private readonly IRepositoryOld repository;
+        private readonly IRepository<Currency> repository;
 
         // Mapper
         private readonly IMapper _mapper;
 
 
 
-        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepositoryOld repository, IMapper mapper) {
+        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository<Currency> repository, IMapper mapper) {
             this._logger = logger;
-            this.nomics = nomics;
-            this.repository = repository;
-            this._mapper = mapper;
+            this.nomics = nomics ?? throw new ArgumentNullException(nameof(nomics));
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         // GET currencies
@@ -35,21 +36,33 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
 
-            IActionResult? actionResultUpdateDb = await UpdateDatabase();
+            await UpdateDatabase(); // This must just update if needed. not return anything.
 
-            if (actionResultUpdateDb != null) {
-                return actionResultUpdateDb;
-            }
+            //if (actionResultUpdateDb != null) {
+            //    return actionResultUpdateDb;
+            //}
 
             try {
-                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAllCurrencies());
+                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
+                
+                if (currencies.Count == 0)
+                {
+                    return NoContent();
+                }
+                
                 return Ok(currencies);
             }
-            catch (Exception e) // TODO: Change Exception type
+            catch (ArgumentNullException e)
             {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
+            catch (OperationCanceledException e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+            // TODO: Add Exceptions
         }
 
         // GET currencies/{code}
@@ -59,40 +72,63 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindOne(string code) {
 
-            IActionResult? actionResultUpdateDb = await UpdateDatabase();
+           await UpdateDatabase();
 
-            if (actionResultUpdateDb != null) {
-                return actionResultUpdateDb;
-            }
+            //if (actionResultUpdateDb != null) {
+            //    return actionResultUpdateDb;
+            //}
 
             try {
-                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(await repository.GetOneCurrency(code));
+                var filtered = await repository.FindBy(c => c.Code == code).ToListAsync(); // Must have only one item
+
+                if (filtered.Count == 0)
+                {
+                    _logger.LogWarning("Item not found");
+                    return NotFound();
+                } else if (filtered.Count > 1)
+                {
+                     _logger.LogWarning("Too many items found");
+                     // TODO: Not valid code
+                }
+
+                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
+                
                 return Ok(currency);
             }
-            catch (Exception e) {
-                Console.WriteLine(e.Message);
-                return NotFound();
+            catch (ArgumentNullException e) {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+            catch (OperationCanceledException e)
+            {
+                _logger.LogError(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
 
         }
 
-        private async Task<IActionResult?> UpdateDatabase() {
+        private async Task UpdateDatabase() {
 
-            IActionResult? actionResult = null;
 
             try {
-                List<CurrencyForCreationDto>? NomicsCurrencies = await nomics.getCurrencies();
+                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCurrencies();
 
                 List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
-                await repository.CreateMultipleCurrencies(CurrenciesToAdd);
+                await repository.CreateRange(CurrenciesToAdd);
+
+            }
+            catch (OperationCanceledException e)
+            {
+                _logger.LogWarning(e.Message);
+                // Didn't update
             }
             catch (Exception e) // TODO: Change Exception type
             {
                 Console.WriteLine($"Excepción {e}");
-                actionResult = StatusCode(StatusCodes.Status503ServiceUnavailable, "There's been a problem with our database.");
+                // throw Exception
+                
             }
 
-            return actionResult;
         }
     }
 }

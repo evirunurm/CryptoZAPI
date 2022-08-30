@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO;
 using Repo;
+using System.Data.Entity;
 
 namespace CryptoZAPI.Controllers {
     [Route("users")]
@@ -12,10 +13,10 @@ namespace CryptoZAPI.Controllers {
     public class UsersController : ControllerBase {
         // Logging
         private readonly ILogger<UsersController> _logger;
-        private readonly IRepositoryOld repository;
+        private readonly IRepository<User> repository;
         private readonly IMapper _mapper;
 
-        public UsersController(ILogger<UsersController> logger, IRepositoryOld repository, IMapper mapper) {
+        public UsersController(ILogger<UsersController> logger, IRepository<User> repository, IMapper mapper) {
             this._logger = logger;
             this.repository = repository;
             this._mapper = mapper;
@@ -33,8 +34,12 @@ namespace CryptoZAPI.Controllers {
                 // TODO: Convert user.password to Hash + salt
                 // TODO: Add user.Salt
 
-                UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.CreateUser(userToAdd));
+                UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
                 return Created($"/users", user);
+            }
+            catch (OperationCanceledException e)
+            {
+                return BadRequest(e.Message);
             }
             catch (Exception e) // TODO: Change Exception type
             {
@@ -50,8 +55,30 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Put([FromBody] UserForUpdateDto updateUser) {
             try {
-                UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.ModifyUser(updateUser));
-                return Ok(user);
+                var foundUsers = await repository.FindBy(u => u.Email == updateUser.Email).ToListAsync();
+
+                if (foundUsers.Count == 0)
+                {
+                    return NotFound();
+                }
+
+                if (foundUsers.Count > 1)
+                {
+                    // Error de argumentos
+                }
+
+                int userId = foundUsers[0].Id;
+
+                User user = _mapper.Map<User>(updateUser);
+
+
+                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(user, userId));
+                return Ok(updatedUser);
+            }
+
+            catch (KeyNotFoundException e)
+            {
+                return NotFound();
             }
             catch (Exception e) // TODO: Change Exception type
             {
@@ -67,7 +94,19 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindOne(string UserEmail) {
             try {
-                UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.GetUserByEmail(UserEmail));
+                var foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
+
+                if (foundUsers.Count == 0)
+                {
+                    return NotFound();
+                }
+
+                if (foundUsers.Count > 1)
+                {
+                    // Error de argumentos
+                }
+
+                UserForViewDto user = _mapper.Map<UserForViewDto>(foundUsers[0]);
                 return Ok(user);
             }
             catch (ArgumentNullException e) {
