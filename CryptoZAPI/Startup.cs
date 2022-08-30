@@ -20,7 +20,7 @@ public static class Startup {
 
         // Singletons
         builder.Services.AddSingleton<INomics, Nomics>();
-        builder.Services.AddSingleton<IRepository, Repository>();
+        builder.Services.AddSingleton<IRepositoryOld, RepositoryOld>();
 
         // Nomics
         builder.Services.AddHttpClient<INomics, Nomics>(client => {

@@ -14,14 +14,14 @@ namespace CryptoZAPI.Controllers {
         // Logging
         private readonly ILogger<CurrenciesController> _logger;
         private readonly INomics nomics;
-        private readonly IRepository repository;
+        private readonly IRepositoryOld repository;
 
         // Mapper
         private readonly IMapper _mapper;
 
 
 
-        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository repository, IMapper mapper) {
+        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepositoryOld repository, IMapper mapper) {
             this._logger = logger;
             this.nomics = nomics;
             this.repository = repository;
@@ -85,19 +85,6 @@ namespace CryptoZAPI.Controllers {
 
                 List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
                 await repository.CreateMultipleCurrencies(CurrenciesToAdd);
-
-                // PROBLEMA (Una de los 2, posiblemente la 2 más que la 1):
-                //
-                // 1- Como el método es Async, no se cambia el nextRequest en la clase.
-                // Solo se cambia en la "instancia" que dura la llamada de está función.
-                //
-                // 2- El CurrenciesController solo existe durante la llamada del usuario
-                // por lo que no tenemos la "referencia" de cuando se ha hecho la ultima
-                // request, ya que, cada vez que se hace una llamada a la API, el CurrencyController
-                // que recibe dicha llamada es distinto del que había anteriormente.
-                //
-                // Posible solución:
-                // Crear una clase estática y que está se encargue de comprobar el tiempo
             }
             catch (Exception e) // TODO: Change Exception type
             {

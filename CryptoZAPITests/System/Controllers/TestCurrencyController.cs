@@ -6,7 +6,7 @@ public class TestCurrencyController
     public async void GetAll_ShouldReturn200Status()
     {
         /// Arrange
-        var repositoryService = new Mock<IRepository>();
+        var repositoryService = new Mock<IRepositoryOld>();
         var loggerService = new Mock<ILogger>();
         var nomicsService = new Mock<INomics>();
 
@@ -26,7 +26,7 @@ public class TestCurrencyController
     public async void GetEmpty_ShouldReturn204Status()
     {
         /// Arrange
-        var repositoryService = new Mock<IRepository>();
+        var repositoryService = new Mock<IRepositoryOld>();
         var loggerService = new Mock<ILogger>();
         var nomicsService = new Mock<INomics>();
 

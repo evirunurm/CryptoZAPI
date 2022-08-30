@@ -6,11 +6,11 @@ using Models.DTO;
 
 namespace Repo {
 
-    public interface IRepository {
+    public interface IRepositoryOld {
         // -- Currencies --
         // ----- GET -----
-        Task<List<Currency>> GetAllCurrencies();
-        Task<Currency> GetOneCurrency(int id); // BORRAR ¿?
+        Task<List<Currency>> GetAllCurrencies(); // YES
+        Task<Currency> GetOneCurrency(int id); // BORRAR ¿? // YES
         Task<Currency> GetOneCurrency(string code);
         // ----- PUT -----
         Task<Currency> ModifyCurrency(int id, Currency currency); // BORRAR ¿?
@@ -21,7 +21,7 @@ namespace Repo {
 
         // -- Users --
         // ----- GET -----
-        Task<User> GetUserById(int id); // BORRAR ¿?
+        Task<User> GetUserById(int id); // BORRAR ¿? // YES
         Task<User> GetUserByEmail(string email);
         // ----- POST -----
         Task<User> CreateUser(User user);
@@ -34,10 +34,10 @@ namespace Repo {
         Task<List<History>> GetAllHistoriesForUser(int userId, int limit); // BORRAR ¿?       
         Task<List<History>> GetAllHistoriesForUser(string userEmail, int limit);
         // ----- POST -----
-        Task<History> CreateHistory(History history);
+        Task<History> CreateHistory(History history); 
     }
 
-    public class Repository : IRepository {
+    public class RepositoryOld : IRepositoryOld {
 
         CryptoZContext _context = new CryptoZContext();
 

@@ -7,7 +7,7 @@ public class TestHistoryController
     public async void GetAll_ShouldReturn200Status()
     {
         /// Arrange
-        var repositoryService = new Mock<IRepository>();
+        var repositoryService = new Mock<IRepositoryOld>();
         var loggerService = new Mock<ILogger>();
 
 
@@ -26,7 +26,7 @@ public class TestHistoryController
     public async void GetEmpty_ShouldReturn204Status()
     {
         /// Arrange
-        var repositoryService = new Mock<IRepository>();
+        var repositoryService = new Mock<IRepositoryOld>();
         var loggerService = new Mock<ILogger>();
 
         //repositoryService.Setup(service => service.GetAllHistoriesForUser(guid, 1)).Returns(HistoryMockData.GetEmpty());

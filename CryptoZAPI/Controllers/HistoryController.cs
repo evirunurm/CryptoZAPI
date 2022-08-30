@@ -14,10 +14,10 @@ namespace CryptoZAPI.Controllers {
 
         // Logging
         private readonly ILogger<HistoryController> _logger;
-        private readonly IRepository repository;
+        private readonly IRepositoryOld repository;
         private readonly IMapper _mapper;
 
-        public HistoryController(ILogger<HistoryController> logger, IRepository repository, IMapper mapper) {
+        public HistoryController(ILogger<HistoryController> logger, IRepositoryOld repository, IMapper mapper) {
             _logger = logger;
             this.repository = repository;
             this._mapper = mapper;

@@ -12,10 +12,10 @@ namespace CryptoZAPI.Controllers {
     public class UsersController : ControllerBase {
         // Logging
         private readonly ILogger<UsersController> _logger;
-        private readonly IRepository repository;
+        private readonly IRepositoryOld repository;
         private readonly IMapper _mapper;
 
-        public UsersController(ILogger<UsersController> logger, IRepository repository, IMapper mapper) {
+        public UsersController(ILogger<UsersController> logger, IRepositoryOld repository, IMapper mapper) {
             this._logger = logger;
             this.repository = repository;
             this._mapper = mapper;
