@@ -61,7 +61,7 @@ namespace Repo
 
         public IQueryable<T> FindBy(Expression<Func<T, bool>> expression) 
         {
-           return dbSet.Where(expression);
+            return dbSet.Where(expression);
         }
 
         public async Task<IEnumerable<T>> GetAll() // throws ArgumentNullException, OperationCanceledException

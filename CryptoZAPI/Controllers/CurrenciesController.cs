@@ -5,7 +5,8 @@ using Models.DTO;
 using Models.Mappers;
 using NomixServices;
 using Repo;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace CryptoZAPI.Controllers {
     [Route("currencies")]
