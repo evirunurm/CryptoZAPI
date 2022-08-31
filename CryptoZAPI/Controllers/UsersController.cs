@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO;
 using Repo;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace CryptoZAPI.Controllers {
     [Route("users")]
@@ -30,11 +30,13 @@ namespace CryptoZAPI.Controllers {
 
             try {
                 User userToAdd = _mapper.Map<User>(newUser);
-
-                // TODO: Convert user.password to Hash + salt
-                // TODO: Add user.Salt
+  
+                userToAdd.Salt = BCrypt.Net.BCrypt.GenerateSalt();
+                userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password, userToAdd.Salt);
 
                 UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
+
+                await repository.SaveDB();
                 return Created($"/users", user);
             }
             catch (OperationCanceledException e)

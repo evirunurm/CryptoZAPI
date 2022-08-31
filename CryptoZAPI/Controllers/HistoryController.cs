@@ -6,7 +6,7 @@ using Models;
 using Models.DTO;
 using Repo;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace CryptoZAPI.Controllers {
     [Route("history")]
