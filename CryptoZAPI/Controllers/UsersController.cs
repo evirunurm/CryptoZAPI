@@ -31,8 +31,8 @@ namespace CryptoZAPI.Controllers {
             try {
                 User userToAdd = _mapper.Map<User>(newUser);
   
-                userToAdd.Salt = BCrypt.Net.BCrypt.GenerateSalt();
-                userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password, userToAdd.Salt);
+                
+                userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
 
                 UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
 
@@ -55,26 +55,26 @@ namespace CryptoZAPI.Controllers {
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Put([FromBody] UserForUpdateDto updateUser) {
+        public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser) {
             try {
-                var foundUsers = await repository.FindBy(u => u.Email == updateUser.Email).ToListAsync();
 
-                if (foundUsers.Count == 0)
-                {
-                    return NotFound();
-                }
+                //if (foundUsers.Count == 0)
+                //{
+                //    return NotFound();
+                //}
 
-                if (foundUsers.Count > 1)
-                {
-                    // Error de argumentos
-                }
+                //if (foundUsers.Count > 1)
+                //{
+                //    // Error de argumentos
+                //}
 
-                int userId = foundUsers[0].Id;
+                //int userId = foundUsers[0].Id;
 
                 User user = _mapper.Map<User>(updateUser);
+                user.Id = id;
 
-
-                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(user, userId));
+                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(user));
+                await repository.SaveDB();
                 return Ok(updatedUser);
             }
 
@@ -84,7 +84,7 @@ namespace CryptoZAPI.Controllers {
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.InnerException.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
             }
         }

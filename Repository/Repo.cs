@@ -23,7 +23,7 @@ namespace Repo
 
 
         Task CreateRange(IEnumerable<T> range); // throws OperationCanceledException
-        Task<T> Update(T o, int id);
+        Task<T> Update(T o);
 
         Task SaveDB();
 
@@ -72,6 +72,8 @@ namespace Repo
         public async Task<T> GetById(int id) // throws KeyNotFoundException
         {
             var foundObj = await dbSet.FindAsync(id);
+            // var foundObj = await dbSet.FirstOrDefaultAsync(t => t.Id == id);
+
             return foundObj ?? throw new KeyNotFoundException();
         }
 
@@ -80,10 +82,16 @@ namespace Repo
             await _context.SaveChangesAsync();
         }
 
-        public async Task<T> Update(T o, int id) // throws KeyNotFoundException
+        public async Task<T> Update(T o) // throws KeyNotFoundException
         {
-            var entity = await GetById(id);
-            _context.Entry(entity).CurrentValues.SetValues(o);
+            // var entity = await GetById(id);
+            //_context.Attach<T>(entity);
+
+
+            //_context.Entry(entity).CurrentValues.SetValues(o);
+
+            dbSet.Attach(o);
+            _context.Entry(o).State = EntityState.Modified;
             return o;
         }
 

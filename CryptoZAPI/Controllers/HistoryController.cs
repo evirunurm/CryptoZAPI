@@ -111,6 +111,7 @@ namespace CryptoZAPI.Controllers {
                 }
 
                 HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));
+                await repository.SaveDB();
 
                 return Ok(historyDto);
             }

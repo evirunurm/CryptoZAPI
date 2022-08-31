@@ -19,7 +19,6 @@ namespace Models
 		[Required]
         [MinLength(8)]
         public string Password { get; set; }
-        public string Salt { get; set; }
 
         // Relations
         public List<History> Histories { get; set; }

@@ -115,8 +115,10 @@ namespace CryptoZAPI.Controllers {
                 List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCurrencies();
 
                 List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
-                await repository.CreateRange(CurrenciesToAdd);
 
+
+                await repository.CreateRange(CurrenciesToAdd);
+                await repository.SaveDB();
             }
             catch (OperationCanceledException e)
             {

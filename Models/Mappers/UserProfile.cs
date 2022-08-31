@@ -23,6 +23,11 @@ namespace Models.Mappers {
                 .ForMember(dest => dest.Id,
                             opt => opt.Ignore())
                 .ReverseMap();
+
+            CreateMap<UserForUpdateDto, User>()
+                .ForMember(dest => dest.Id,
+                            opt => opt.Ignore())
+                .ReverseMap();
         }
     }
 }

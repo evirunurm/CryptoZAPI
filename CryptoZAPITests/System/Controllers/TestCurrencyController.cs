@@ -2,47 +2,47 @@
 
 public class TestCurrencyController
 {
-    [Fact]
-    public async void GetAll_ShouldReturn200Status()
-    {
-        /// Arrange
-        var repositoryService = new Mock<IRepositoryOld>();
-        var loggerService = new Mock<ILogger>();
-        var nomicsService = new Mock<INomics>();
+    // [Fact]
+    //public async void GetAll_ShouldReturn200Status()
+    //{
+    //    /// Arrange
+    //    var repositoryService = new Mock<IRepositoryOld>();
+    //    var loggerService = new Mock<ILogger>();
+    //    var nomicsService = new Mock<INomics>();
 
 
-        //repositoryService.Setup(_ => _.GetAllCurrencies()).Returns(await CurrencyMockData.GetAll());
-        var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
+    //    //repositoryService.Setup(_ => _.GetAllCurrencies()).Returns(await CurrencyMockData.GetAll());
+    //    var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
 
-        /// Act
-        var result = await sut.GetAll();
-        var okObjectResult = result as OkObjectResult;
+    //    /// Act
+    //    var result = await sut.GetAll();
+    //    var okObjectResult = result as OkObjectResult;
 
-        // /// Assert
-        okObjectResult.StatusCode.Should().Be(200);
-    }
+    //    // /// Assert
+    //    okObjectResult.StatusCode.Should().Be(200);
+    //}
 
-    [Fact]
-    public async void GetEmpty_ShouldReturn204Status()
-    {
-        /// Arrange
-        var repositoryService = new Mock<IRepositoryOld>();
-        var loggerService = new Mock<ILogger>();
-        var nomicsService = new Mock<INomics>();
+    //[Fact]
+    //public async void GetEmpty_ShouldReturn204Status()
+    //{
+    //    /// Arrange
+    //    var repositoryService = new Mock<IRepositoryOld>();
+    //    var loggerService = new Mock<ILogger>();
+    //    var nomicsService = new Mock<INomics>();
 
-        //repositoryService.Setup(service => service.GetAllCurrencies()).Returns(CurrencyMockData.GetEmpty());
-        var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
+    //    //repositoryService.Setup(service => service.GetAllCurrencies()).Returns(CurrencyMockData.GetEmpty());
+    //    var sut = new CurrenciesController(null, nomicsService.Object, repositoryService.Object, null);
 
-        /// Act
-        var result = await sut.GetAll();
-        var noContenetResult = result as NoContentResult;
+    //    /// Act
+    //    var result = await sut.GetAll();
+    //    var noContenetResult = result as NoContentResult;
 
-        /// Assert
-        noContenetResult.StatusCode.Should().Be(204);
+    //    /// Assert
+    //    noContenetResult.StatusCode.Should().Be(204);
 
-        // Makes sure the repository is called only once 
-        // repositoryService.Verify(service => service.GetAllCurrencies(), Times.Exactly(1));
-    }
+    //    // Makes sure the repository is called only once 
+    //    // repositoryService.Verify(service => service.GetAllCurrencies(), Times.Exactly(1));
+    //}
 
 
 }

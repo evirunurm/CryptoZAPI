@@ -205,8 +205,7 @@ namespace Repo {
                 // Here we should map userDto to User
 
                 // Hash password and generate salt
-                user.Salt = BCrypt.Net.BCrypt.GenerateSalt();
-                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, user.Salt);
+                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
                 // Save user
                 await _context.Users.AddAsync(user);
