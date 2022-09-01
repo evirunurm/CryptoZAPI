@@ -21,7 +21,6 @@ public static class Startup {
 
         // Singletons
         builder.Services.AddScoped<INomics, Nomics>();
-        builder.Services.AddScoped<IRepositoryOld, RepositoryOld>();
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 

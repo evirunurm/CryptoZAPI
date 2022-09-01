@@ -6,15 +6,13 @@ using Models.Mappers;
 using NomixServices;
 using Repo;
 using Microsoft.EntityFrameworkCore;
-
+using Serilog;
 
 namespace CryptoZAPI.Controllers {
     [Route("currencies")]
     [ApiController]
     public class CurrenciesController : ControllerBase {
 
-        // Logging
-        private readonly ILogger<CurrenciesController> _logger;
         private readonly INomics nomics;
         private readonly IRepository<Currency> repository;
 
@@ -23,8 +21,7 @@ namespace CryptoZAPI.Controllers {
 
 
 
-        public CurrenciesController(ILogger<CurrenciesController> logger, INomics nomics, IRepository<Currency> repository, IMapper mapper) {
-            this._logger = logger;
+        public CurrenciesController(INomics nomics, IRepository<Currency> repository, IMapper mapper) {
             this.nomics = nomics ?? throw new ArgumentNullException(nameof(nomics));
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -48,9 +45,10 @@ namespace CryptoZAPI.Controllers {
                 
                 if (currencies.Count == 0)
                 {
+                    Log.Warning("No content found");
                     return NoContent();
                 }
-                
+
                 return Ok(currencies);
             }
             catch (ArgumentNullException e)
@@ -84,12 +82,12 @@ namespace CryptoZAPI.Controllers {
 
                 if (filtered.Count == 0)
                 {
-                    _logger.LogWarning("Item not found");
+                    Log.Warning("Item not found");
                     return NotFound();
                 } else if (filtered.Count > 1)
                 {
-                     _logger.LogWarning("Too many items found");
-                     // TODO: Not valid code
+                    Log.Warning("Too many items found");
+                    // TODO: Not valid code
                 }
 
                 CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
@@ -97,12 +95,12 @@ namespace CryptoZAPI.Controllers {
                 return Ok(currency);
             }
             catch (ArgumentNullException e) {
-                _logger.LogError(e.Message);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (OperationCanceledException e)
             {
-                _logger.LogError(e.Message);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
 
@@ -122,12 +120,13 @@ namespace CryptoZAPI.Controllers {
             }
             catch (OperationCanceledException e)
             {
-                _logger.LogWarning(e.Message);
+                Log.Warning(e.Message);
                 // Didn't update
             }
             catch (Exception e) // TODO: Change Exception type
             {
                 Console.WriteLine($"Excepción {e}");
+                Log.Error(e.Message);
                 // throw Exception
                 
             }

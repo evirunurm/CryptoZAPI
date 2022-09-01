@@ -7,21 +7,19 @@ using Models.DTO;
 using Repo;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace CryptoZAPI.Controllers {
     [Route("history")]
     [ApiController]
     public class HistoryController : ControllerBase {
 
-        // Logging
-        private readonly ILogger<HistoryController> _logger;
         private readonly IRepository<User> repositoryUser;
         private readonly IRepository<Currency> repositoryCurrency;
         private readonly IRepository<History> repository;
         private readonly IMapper _mapper;
 
-        public HistoryController(ILogger<HistoryController> logger, IRepository<History> repositoryHistory, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
-            _logger = logger;
+        public HistoryController(IRepository<History> repositoryHistory, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
             this.repositoryUser = repositoryUser ?? throw new ArgumentNullException(nameof(repositoryUser));
             this.repositoryCurrency = repositoryCurrency;
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -43,6 +41,7 @@ namespace CryptoZAPI.Controllers {
                 var foundUsers = await repositoryUser.FindBy(u => u.Email == emailUser).ToListAsync();
                 if (foundUsers.Count == 0)
                 {
+                    Log.Warning("No content found");
                     NotFound();
                 } else if (foundUsers.Count > 1)
                 {
@@ -53,6 +52,7 @@ namespace CryptoZAPI.Controllers {
                 histories = _mapper.Map<List<HistoryForViewDto>>(( await repository.FindBy(h => h.UserId == userId).ToListAsync() ));
 
                 if (histories.Count == 0) {
+                    Log.Warning("No content found");
                     return NoContent();
                 }
 
@@ -61,17 +61,17 @@ namespace CryptoZAPI.Controllers {
             }
             catch (ArgumentNullException e)
             {
-                Console.WriteLine(e);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (OperationCanceledException e)
             {
-                Console.WriteLine(e);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Console.WriteLine(e);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
         }
@@ -91,7 +91,8 @@ namespace CryptoZAPI.Controllers {
 
                 if (foundListCurrencyOrigin.Count == 0 || foundListCurrencyDestination.Count == 0)
                 {
-                   return NotFound(); // TODO: Edit
+                    Log.Warning("No content found");
+                    return NotFound(); // TODO: Edit
                 }
 
                 historyMapped.Origin = foundListCurrencyOrigin[0];
@@ -104,6 +105,7 @@ namespace CryptoZAPI.Controllers {
                     var foundUsers = await repositoryUser.FindBy(u => u.Email == history.UserEmail).ToListAsync();
                     if (foundUsers.Count == 0)
                     {
+                        Log.Warning("No content found");
                         return NotFound(); // TODO: Edit
                     }
 
@@ -117,17 +119,17 @@ namespace CryptoZAPI.Controllers {
             }
             catch (ArgumentNullException e)
             {
-                Console.WriteLine(e);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (OperationCanceledException e)
             {
-                Console.WriteLine(e);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Console.WriteLine(e.Message);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
         }

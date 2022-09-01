@@ -8,7 +8,6 @@ public class TestHistoryController
     {
         /// Arrange
         var repositoryService = new Mock<IRepositoryOld>();
-        var loggerService = new Mock<ILogger>();
 
 
         //repositoryService.Setup(_ => _.GetAllHistoriesForUser(guid,1)).Returns(HistoryMockData.GetAll());
@@ -27,7 +26,6 @@ public class TestHistoryController
     {
         /// Arrange
         var repositoryService = new Mock<IRepositoryOld>();
-        var loggerService = new Mock<ILogger>();
 
         //repositoryService.Setup(service => service.GetAllHistoriesForUser(guid, 1)).Returns(HistoryMockData.GetEmpty());
         var sut = new HistoryController(null, repositoryService.Object, null);

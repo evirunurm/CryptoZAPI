@@ -6,18 +6,17 @@ using Models;
 using Models.DTO;
 using Repo;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace CryptoZAPI.Controllers {
     [Route("users")]
     [ApiController]
     public class UsersController : ControllerBase {
-        // Logging
-        private readonly ILogger<UsersController> _logger;
+
         private readonly IRepository<User> repository;
         private readonly IMapper _mapper;
 
-        public UsersController(ILogger<UsersController> logger, IRepository<User> repository, IMapper mapper) {
-            this._logger = logger;
+        public UsersController(IRepository<User> repository, IMapper mapper) {
             this.repository = repository;
             this._mapper = mapper;
         }
@@ -41,11 +40,12 @@ namespace CryptoZAPI.Controllers {
             }
             catch (OperationCanceledException e)
             {
+                Log.Error(e.Message);
                 return BadRequest(e.Message);
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Console.WriteLine(e.Message);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
             }
         }
@@ -80,11 +80,12 @@ namespace CryptoZAPI.Controllers {
 
             catch (KeyNotFoundException e)
             {
+                Log.Warning("No content found");
                 return NotFound();
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Console.WriteLine(e.InnerException.Message);
+                Log.Error(e.InnerException.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
             }
         }
@@ -100,6 +101,7 @@ namespace CryptoZAPI.Controllers {
 
                 if (foundUsers.Count == 0)
                 {
+                    Log.Warning("No content found");
                     return NotFound();
                 }
 
@@ -112,11 +114,11 @@ namespace CryptoZAPI.Controllers {
                 return Ok(user);
             }
             catch (ArgumentNullException e) {
-                Console.WriteLine(e.Message);
+                Log.Error(e.Message);
                 return NotFound();
             }
             catch (Exception e) {
-                Console.WriteLine(e.Message);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
         }
