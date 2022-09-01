@@ -16,6 +16,8 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.File("logs.log")
     .CreateLogger();
 
+Log.Information("Starting App");
+
 var app = builder.Build();
 
 app.Configure();
