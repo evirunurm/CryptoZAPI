@@ -13,10 +13,7 @@ public static class Startup {
         builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile));
 
         // Controllers
-        builder.Services.AddControllers(setupAction =>
-        {
-            setupAction.ReturnHttpNotAcceptable = true;
-        }).AddXmlDataContractSerializerFormatters();
+        builder.Services.AddControllers().AddXmlDataContractSerializerFormatters();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
@@ -38,6 +35,19 @@ public static class Startup {
         if (app.Environment.IsDevelopment()) {
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseExceptionHandler(appBuilder =>
+            {
+                appBuilder.Run(async context =>
+                {
+                    context.Response.StatusCode = 500;
+                    await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
+                });
+            });
+
         }
 
         app.UseHttpsRedirection();
