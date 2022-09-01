@@ -14,6 +14,7 @@ namespace Data {
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<History> Histories { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Country> Countries { get; set; }
 
         // DB Path
         private string DbPath = $"DB\\SQLite.DB";
@@ -50,6 +51,12 @@ namespace Data {
                 .WithMany(c => c.HistoriesDestination)
                 .HasForeignKey(h => h.DestinationId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+              .HasOne(u => u.Country)
+              .WithMany(c => c.Users)
+              .HasForeignKey(u => u.CountryId)
+              .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
