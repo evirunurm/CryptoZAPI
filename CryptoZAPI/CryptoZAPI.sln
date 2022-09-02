@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "..\Utils\Utils.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "..\Data\Data.csproj", "{2ECA178E-5E50-4ECC-8BBA-C0DDDAFF3CCB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Puta", "..\Puta\Puta.csproj", "{33B1A286-6071-4AE3-B81E-D45E54543E81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{2ECA178E-5E50-4ECC-8BBA-C0DDDAFF3CCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2ECA178E-5E50-4ECC-8BBA-C0DDDAFF3CCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2ECA178E-5E50-4ECC-8BBA-C0DDDAFF3CCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33B1A286-6071-4AE3-B81E-D45E54543E81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33B1A286-6071-4AE3-B81E-D45E54543E81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33B1A286-6071-4AE3-B81E-D45E54543E81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33B1A286-6071-4AE3-B81E-D45E54543E81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
