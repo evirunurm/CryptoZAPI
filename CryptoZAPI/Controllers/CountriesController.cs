@@ -7,11 +7,13 @@ using NomixServices;
 using Repo;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Models;
 
 namespace CryptoZAPI.Controllers {
     [Route("countries")]
     [ApiController]
     public class CountriesController : ControllerBase {
+
 
    
         private readonly IRepository<Country> repository;
@@ -32,6 +34,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
+            /*
 
             await UpdateDatabase(); // This must just update if needed. not return anything.
 
@@ -61,6 +64,8 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             // TODO: Add Exceptions
+            */
+            return null;
         }
 
         // GET currencies/{code}
@@ -69,6 +74,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindOne(string code) {
+            /*
 
            await UpdateDatabase();
 
@@ -102,12 +108,14 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
+            */
+            return null;
 
         }
 
         private async Task UpdateDatabase() {
 
-
+            /*
             try {
                 List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCountries();
 
@@ -128,7 +136,7 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 // throw Exception
                 
-            }
+            }*/
 
         }
     }
