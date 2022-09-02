@@ -7,6 +7,7 @@ using Models.DTO;
 using Repo;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using RestCountriesServices;
 
 namespace CryptoZAPI.Controllers {
     [Route("users")]
@@ -14,9 +15,14 @@ namespace CryptoZAPI.Controllers {
     public class UsersController : ControllerBase {
 
         private readonly IRepository<User> repository;
+      
+
         private readonly IMapper _mapper;
 
-        public UsersController(IRepository<User> repository, IMapper mapper) {
+        private readonly IRestCountries countries;
+
+        public UsersController(IRestCountries countries, IRepository<User> repository, IMapper mapper) {
+            this.countries = countries ?? throw new ArgumentNullException(nameof(countries));
             this.repository = repository;
             this._mapper = mapper;
         }
@@ -26,6 +32,10 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
+
+             List<CountryForCreationDto> CountryCurrencies = await countries.getCountries();
+
+
 
             try {
                 User userToAdd = _mapper.Map<User>(newUser);

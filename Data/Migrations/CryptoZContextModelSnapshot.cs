@@ -83,10 +83,34 @@ namespace Data.Migrations
                     b.ToTable("Histories");
                 });
 
+            modelBuilder.Entity("Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
+
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CountryId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
@@ -104,6 +128,8 @@ namespace Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
 
                     b.ToTable("Users");
                 });
@@ -135,11 +161,27 @@ namespace Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Models.User", b =>
+                {
+                    b.HasOne("Models.Country", "Country")
+                        .WithMany("Users")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
             modelBuilder.Entity("CryptoZAPI.Models.Currency", b =>
                 {
                     b.Navigation("HistoriesDestination");
 
                     b.Navigation("HistoriesOrigin");
+                });
+
+            modelBuilder.Entity("Models.Country", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Models.User", b =>

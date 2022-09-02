@@ -25,14 +25,14 @@ namespace NomixServices {
         {
             // TODO 
             // Solucionar que getCurrencies solo haga una llamada cada X tiempo.
-            if (DateTime.Parse(this.configuration["LastUpdateNomics:date"]) >= DateTime.Now.Date )
+            if (DateTime.Parse(this.configuration["LastUpdatesAPI:nomics"]) >= DateTime.Now.Date )
             {
                 throw new Exception(); // TODO: Not neecsary to update
 
             }
 
 
-            this.configuration["LastUpdateNomics:date"] = DateTime.Now.Date.ToString();
+            this.configuration["LastUpdatesAPI:nomics"] = DateTime.Now.Date.ToString();
 
             string apiKey = configuration["environmentVariables:ApiKey"];
 

@@ -35,7 +35,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
             /*
-
+            
             await UpdateDatabase(); // This must just update if needed. not return anything.
 
             //if (actionResultUpdateDb != null) {
@@ -43,7 +43,7 @@ namespace CryptoZAPI.Controllers {
             //}
 
             try {
-                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
+                List<CountriesForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
                 
                 if (currencies.Count == 0)
                 {
@@ -64,7 +64,7 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             // TODO: Add Exceptions
-            */
+           */
             return null;
         }
 
@@ -75,7 +75,6 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindOne(string code) {
             /*
-
            await UpdateDatabase();
 
             //if (actionResultUpdateDb != null) {

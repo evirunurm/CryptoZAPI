@@ -3,6 +3,7 @@ using Models;
 using Models.Mappers;
 using NomixServices;
 using Repo;
+using RestCountriesServices;
 
 public static class Startup {
 
@@ -21,13 +22,23 @@ public static class Startup {
 
         // Singletons
         builder.Services.AddScoped<INomics, Nomics>();
+        builder.Services.AddScoped<IRestCountries, RestCountries>();
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+     
+
 
 
         // Nomics
         builder.Services.AddHttpClient<INomics, Nomics>(client => {
             client.BaseAddress = new Uri("https://api.nomics.com/v1/");
-        });        
+        });
+
+        // RestCountries
+        builder.Services.AddHttpClient<IRestCountries, RestCountries>(client =>
+        {
+            client.BaseAddress = new Uri("https://restcountries.com/v2/");
+        });
     }
 
     public static void Configure(this WebApplication app) {

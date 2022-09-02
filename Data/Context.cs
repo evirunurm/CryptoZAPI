@@ -56,7 +56,7 @@ namespace Data {
               .HasOne(u => u.Country)
               .WithMany(c => c.Users)
               .HasForeignKey(u => u.CountryId)
-              .OnDelete(DeleteBehavior.NoAction);
+              .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
