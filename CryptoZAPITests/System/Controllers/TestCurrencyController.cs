@@ -7,7 +7,6 @@ public class TestCurrencyController
     //{
     //    /// Arrange
     //    var repositoryService = new Mock<IRepositoryOld>();
-    //    var loggerService = new Mock<ILogger>();
     //    var nomicsService = new Mock<INomics>();
 
 
@@ -27,7 +26,6 @@ public class TestCurrencyController
     //{
     //    /// Arrange
     //    var repositoryService = new Mock<IRepositoryOld>();
-    //    var loggerService = new Mock<ILogger>();
     //    var nomicsService = new Mock<INomics>();
 
     //    //repositoryService.Setup(service => service.GetAllCurrencies()).Returns(CurrencyMockData.GetEmpty());

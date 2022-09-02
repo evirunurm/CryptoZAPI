@@ -7,32 +7,34 @@ using NomixServices;
 using Repo;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Models;
 
 namespace CryptoZAPI.Controllers {
-    [Route("currencies")]
+    [Route("countries")]
     [ApiController]
-    public class CurrenciesController : ControllerBase {
+    public class CountriesController : ControllerBase {
 
-        private readonly INomics nomics;
-        private readonly IRepository<Currency> repository;
+
+   
+        private readonly IRepository<Country> repository;
 
         // Mapper
         private readonly IMapper _mapper;
 
 
 
-        public CurrenciesController(INomics nomics, IRepository<Currency> repository, IMapper mapper) {
-            this.nomics = nomics ?? throw new ArgumentNullException(nameof(nomics));
+        public CountriesController(IRepository<Country> repository, IMapper mapper) {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        // GET currencies
+        // GET countries
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
+            /*
 
             await UpdateDatabase(); // This must just update if needed. not return anything.
 
@@ -62,6 +64,8 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             // TODO: Add Exceptions
+            */
+            return null;
         }
 
         // GET currencies/{code}
@@ -70,6 +74,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindOne(string code) {
+            /*
 
            await UpdateDatabase();
 
@@ -103,16 +108,18 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
+            */
+            return null;
 
         }
 
         private async Task UpdateDatabase() {
 
-
+            /*
             try {
-                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCurrencies();
+                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCountries();
 
-                List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
+                List<Country> CurrenciesToAdd = _mapper.Map<List<Country>>(NomicsCurrencies);
 
 
                 await repository.CreateRange(CurrenciesToAdd);
@@ -129,7 +136,7 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 // throw Exception
                 
-            }
+            }*/
 
         }
     }

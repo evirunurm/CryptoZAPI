@@ -1,6 +1,5 @@
 ﻿using Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,14 +32,12 @@ namespace Repo
     public class Repository<T> : IRepository<T>, IDisposable
         where T : class
     {
-        private readonly ILogger _logger;
         private DbContext _context;
         private DbSet<T> dbSet;
 
-        public Repository(ILogger logger = null)
+        public Repository()
         {
             _context = new CryptoZContext();
-            _logger = logger;
             dbSet = _context.Set<T>();
         }
 

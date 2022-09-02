@@ -1,0 +1,310 @@
+{
+	"info": {
+		"_postman_id": "af9311be-e7cb-48b6-9e9d-74f8cae342c0",
+		"name": "CryptoZ API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "GET Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/users",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/users?UserEmail=postman@postman.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "UserEmail",
+									"value": "postman@postman.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET User (Accept:application/json)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Application",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7101/users?UserEmail=postman@postman.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "UserEmail",
+									"value": "postman@postman.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET User (Accept:application/xml)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Application",
+								"value": "application/xml",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7101/users?UserEmail=postman@postman.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "UserEmail",
+									"value": "postman@postman.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET User (unexisting)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/users?UserEmail=postman@@@@@@@postman.com",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "UserEmail",
+									"value": "postman@@@@@@@postman.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"Name\" : \"Postman\",\n\t\"Email\" : \"postman@postman.com\",\n\t\"Password\" : \"1234567890\"\n}"
+						},
+						"url": {
+							"raw": "https://localhost:7101/users",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT User (Change Name/Password)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"Name\": \"Postman_Edited\",\n  \"Email\" : \"postman@postman.com\",\n  \"Password\": \"1234567890\",\n  \"NewPassword\": \"0123456789\"\n}"
+						},
+						"url": {
+							"raw": "https://localhost:7101/users",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Currencies",
+			"item": [
+				{
+					"name": "GET Currencies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/currencies",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"currencies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Currency (With Code)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/currencies/BTC",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"currencies",
+								"BTC"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Histories",
+			"item": [
+				{
+					"name": "GET History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/history",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET History (With UserEmail and Limit)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7101/history?emailUser=string&limit=10",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7101",
+							"path": [
+								"history"
+							],
+							"query": [
+								{
+									"key": "emailUser",
+									"value": "string"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Conversions",
+			"item": []
+		}
+	]
+}
