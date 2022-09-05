@@ -11,7 +11,7 @@ public static class Startup {
 
         // AutoMapper
         //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-        builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile));
+        builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile), typeof(CountryProfile));
 
         // Controllers
         builder.Services.AddControllers().AddXmlDataContractSerializerFormatters();

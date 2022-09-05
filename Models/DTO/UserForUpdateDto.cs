@@ -15,5 +15,6 @@ namespace Models.DTO {
         public string Password { get; set; }
         [MinLength(8)]
         public string NewPassword { get; set; }
+        public int CountryId { get; set; }  
     }
 }

@@ -19,10 +19,7 @@ namespace CryptoZAPI.Controllers {
 
         private readonly IMapper _mapper;
 
-        private readonly IRestCountries countries;
-
-        public UsersController(IRestCountries countries, IRepository<User> repository, IMapper mapper) {
-            this.countries = countries ?? throw new ArgumentNullException(nameof(countries));
+        public UsersController(IRepository<User> repository, IMapper mapper) {
             this.repository = repository;
             this._mapper = mapper;
         }
@@ -33,7 +30,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
 
-             List<CountryForCreationDto> CountryCurrencies = await countries.getCountries();
+             //List<CountryForCreationDto> CountryCurrencies = await countries.getCountries();
 
 
 
@@ -82,6 +79,7 @@ namespace CryptoZAPI.Controllers {
 
                 User user = _mapper.Map<User>(updateUser);
                 user.Id = id;
+                
 
                 UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(user));
                 await repository.SaveDB();

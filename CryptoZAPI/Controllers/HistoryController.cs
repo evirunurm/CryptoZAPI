@@ -19,7 +19,7 @@ namespace CryptoZAPI.Controllers {
         private readonly IRepository<History> repository;
         private readonly IMapper _mapper;
 
-        public HistoryController(IRepository<History> repositoryHistory, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
+        public HistoryController(IRepository<History> repository, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
             this.repositoryUser = repositoryUser ?? throw new ArgumentNullException(nameof(repositoryUser));
             this.repositoryCurrency = repositoryCurrency;
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));

@@ -24,3 +24,6 @@ namespace Models.DTO {
         public double Value { get; set; }
     }
 }
+
+
+

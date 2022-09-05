@@ -3,11 +3,11 @@ using CryptoZAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTO;
 using Models.Mappers;
-using NomixServices;
 using Repo;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Models;
+using RestCountriesServices;
 
 namespace CryptoZAPI.Controllers {
     [Route("countries")]
@@ -15,26 +15,29 @@ namespace CryptoZAPI.Controllers {
     public class CountriesController : ControllerBase {
 
 
-   
+        private readonly IRestCountries restCountries;
         private readonly IRepository<Country> repository;
 
         // Mapper
         private readonly IMapper _mapper;
+        
 
 
 
-        public CountriesController(IRepository<Country> repository, IMapper mapper) {
+        public CountriesController(IRestCountries restCountries, IRepository<Country> repository, IMapper mapper) {
+            this.restCountries = restCountries ?? throw new ArgumentNullException(nameof(restCountries));
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+     
         }
 
         // GET countries
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Country>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
-            /*
+            
             
             await UpdateDatabase(); // This must just update if needed. not return anything.
 
@@ -43,15 +46,15 @@ namespace CryptoZAPI.Controllers {
             //}
 
             try {
-                List<CountriesForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
+                List<CountryForViewDto> countries = _mapper.Map<List<CountryForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
                 
-                if (currencies.Count == 0)
+                if (countries.Count == 0)
                 {
                     Log.Warning("No content found");
                     return NoContent();
                 }
 
-                return Ok(currencies);
+                return Ok(countries);
             }
             catch (ArgumentNullException e)
             {
@@ -64,17 +67,17 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
             // TODO: Add Exceptions
-           */
+           
             return null;
         }
 
-        // GET currencies/{code}
-        [HttpGet("{code}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyForViewDto))]
+        // GET countries/{countrycode}
+        [HttpGet("{countrycode}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Country))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindOne(string code) {
-            /*
+        public async Task<IActionResult> FindOne(string countrycode) {
+            
            await UpdateDatabase();
 
             //if (actionResultUpdateDb != null) {
@@ -82,7 +85,7 @@ namespace CryptoZAPI.Controllers {
             //}
 
             try {
-                var filtered = await repository.FindBy(c => c.Code == code).ToListAsync(); // Must have only one item
+                var filtered = await repository.FindBy(c => c.CountryCode == countrycode).ToListAsync(); // Must have only one item
 
                 if (filtered.Count == 0)
                 {
@@ -94,9 +97,9 @@ namespace CryptoZAPI.Controllers {
                     // TODO: Not valid code
                 }
 
-                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
+                Country country = _mapper.Map<Country>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
                 
-                return Ok(currency);
+                return Ok(country);
             }
             catch (ArgumentNullException e) {
                 Log.Error(e.Message);
@@ -107,21 +110,21 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            */
+            
             return null;
 
         }
 
         private async Task UpdateDatabase() {
 
-            /*
+            
             try {
-                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCountries();
+                List<CountryForCreationDto> CurrentCountry = await restCountries.getCountries();
 
-                List<Country> CurrenciesToAdd = _mapper.Map<List<Country>>(NomicsCurrencies);
+                List<Country> CountriesToAdd = _mapper.Map<List<Country>>(CurrentCountry);
 
 
-                await repository.CreateRange(CurrenciesToAdd);
+                await repository.CreateRange(CountriesToAdd);
                 await repository.SaveDB();
             }
             catch (OperationCanceledException e)
@@ -135,7 +138,7 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 // throw Exception
                 
-            }*/
+            }
 
         }
     }
