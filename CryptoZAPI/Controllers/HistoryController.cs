@@ -49,7 +49,35 @@ namespace CryptoZAPI.Controllers {
                 }
 
                 int userId = foundUsers[0].Id;
-                histories = _mapper.Map<List<HistoryForViewDto>>(( await repository.FindBy(h => h.UserId == userId).ToListAsync() ));
+                List<History> history = await repository.FindBy(h => h.UserId == userId).ToListAsync();
+
+                foreach (History h in history)
+                {
+                    var foundDestination = await repositoryCurrency.FindBy(c => c.Id == h.DestinationId).ToListAsync();
+                    if (foundDestination.Count == 0)
+                    {
+                        Log.Warning("No content found");
+                        NotFound();
+                    }
+                    else if (foundDestination.Count > 1)
+                    {
+                        // TODO: Error en el argumento
+                    }
+                    var foundOrigin = await repositoryCurrency.FindBy(c => c.Id == h.OriginId).ToListAsync();
+                    if (foundOrigin.Count == 0)
+                    {
+                        Log.Warning("No content found");
+                        NotFound();
+                    }
+                    else if (foundOrigin.Count > 1)
+                    {
+                        // TODO: Error en el argumento
+                    }
+
+                    h.Origin = foundOrigin[0];
+                    h.Destination = foundDestination[0];
+                }
+                histories = _mapper.Map<List<HistoryForViewDto>>(history);
 
                 if (histories.Count == 0) {
                     Log.Warning("No content found");

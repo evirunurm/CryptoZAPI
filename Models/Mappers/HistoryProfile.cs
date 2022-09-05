@@ -18,9 +18,9 @@ namespace Models.Mappers {
 
             CreateMap<History, HistoryForViewDto>()
                 .ForMember(dest => dest.OriginCode,
-                            opt => opt.MapFrom(src => src.Origin.Name))
+                            opt => opt.MapFrom(src => src.Origin.Code))
                 .ForMember(dest => dest.DestinationCode,
-                            opt => opt.MapFrom(src => src.Destination.Name))
+                            opt => opt.MapFrom(src => src.Destination.Code))
                 .ReverseMap();
 
 
