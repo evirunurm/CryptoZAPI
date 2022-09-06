@@ -25,7 +25,8 @@ public static class Startup {
         builder.Services.AddScoped<IRestCountries, RestCountries>();
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-     
+        // CORS
+        builder.Services.AddCors();
 
 
 
@@ -59,6 +60,14 @@ public static class Startup {
             });
 
         }
+
+        // Shows UseCors with CorsPolicyBuilder.
+        app.UseCors(builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
 
         app.UseHttpsRedirection();
 
