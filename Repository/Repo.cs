@@ -95,12 +95,6 @@ namespace Repo
 
         public async Task<T> Update(T o) // throws KeyNotFoundException
         {
-            // var entity = await GetById(id);
-            //_context.Attach<T>(entity);
-
-
-            //_context.Entry(entity).CurrentValues.SetValues(o);
-
             dbSet.Attach(o);
             _context.Entry(o).State = EntityState.Modified;
             return o;

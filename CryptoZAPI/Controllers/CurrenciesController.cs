@@ -42,22 +42,19 @@ namespace CryptoZAPI.Controllers {
 
             try {
                 List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
-                
-                if (currencies.Count == 0)
-                {
+
+                if (currencies.Count == 0) {
                     Log.Warning("No content found");
                     return NoContent();
                 }
 
                 return Ok(currencies);
             }
-            catch (ArgumentNullException e)
-            {
+            catch (ArgumentNullException e) {
                 Console.WriteLine(e);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Console.WriteLine(e);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
@@ -71,7 +68,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindById(int id) {
 
-           await UpdateDatabase();
+            await UpdateDatabase();
 
             //if (actionResultUpdateDb != null) {
             //    return actionResultUpdateDb;
@@ -80,18 +77,17 @@ namespace CryptoZAPI.Controllers {
             try {
                 var foundCurrency = await repository.GetById(id); // Must have only one item
 
-              
+
 
                 CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(foundCurrency); // MAPPING FROM Currency TO CurrencyForViewDto 
-                
+
                 return Ok(currency);
             }
             catch (ArgumentNullException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
@@ -104,8 +100,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindByCode(string code)
-        {
+        public async Task<IActionResult> FindByCode(string code) {
 
             await UpdateDatabase();
 
@@ -113,17 +108,14 @@ namespace CryptoZAPI.Controllers {
             //    return actionResultUpdateDb;
             //}
 
-            try
-            {
+            try {
                 var filtered = await repository.FindBy(c => c.Code == code.ToUpper()).ToListAsync(); // Must have only one item
 
-                if (filtered.Count == 0)
-                {
+                if (filtered.Count == 0) {
                     Log.Warning("Item not found");
                     return NotFound();
                 }
-                else if (filtered.Count > 1)
-                {
+                else if (filtered.Count > 1) {
                     Log.Warning("Too many items found");
                     // TODO: Not valid code
                 }
@@ -132,42 +124,57 @@ namespace CryptoZAPI.Controllers {
 
                 return Ok(currency);
             }
-            catch (ArgumentNullException e)
-            {
+            catch (ArgumentNullException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
 
         }
 
+        private bool Equals(Currency a, Currency b) {
+            return a.Code == b.Code || a.Id == b.Id;
+        }
+
         private async Task UpdateDatabase() {
 
 
             try {
-                List<CurrencyForCreationDto> NomicsCurrencies = await nomics.getCurrencies();
+                List<Currency> NomicsCurrencies = _mapper.Map<List<Currency>>(await nomics.getCurrencies());
+                List<Currency> currenciesInContext = (List<Currency>)await repository.GetAll();
 
-                List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
-
-                await repository.CreateRange(CurrenciesToAdd);
-                await repository.SaveDB();
-
-                foreach (Currency currency in CurrenciesToAdd)
-                {
-                     currency.Id = (await repository.FindBy(c => c.Code == currency.Code).ToListAsync())[0].Id;
-                     Console.WriteLine(currency.Id);
+                List<Currency> currenciesToAdd = NomicsCurrencies.ExceptBy(currenciesInContext.Select(c => c.Code),
+                                                                              x => x.Code).ToList();
+                List<Currency> currenciesToUpdate = currenciesInContext.IntersectBy(NomicsCurrencies.Select(c => c.Code),
+                                                                              x => x.Code).ToList();
+                if (currenciesToAdd.Count > 0) {
+                    await repository.CreateRange(currenciesToAdd);
+                    await repository.SaveDB();
                 }
 
+                // TODO CAMBIAR A UNA LAMBDA O ALGO ASÍ.
+                if (currenciesToUpdate.Count > 0) {
+                    foreach (Currency currency in currenciesToUpdate) {
+                        
+                        Currency? updatedCurrency = NomicsCurrencies.FirstOrDefault(n => n.Code == currency.Code);
+                        
+                        if (updatedCurrency == null)
+                            continue;
 
-                await repository.UpdateRange(CurrenciesToAdd);
-                await repository.SaveDB();
+                        currency.PriceDate = updatedCurrency.PriceDate;
+                        currency.Price = updatedCurrency.Price;
+                        currency.Name = updatedCurrency.Name;
+                        currency.LogoUrl = updatedCurrency.LogoUrl;
+                        await repository.Update(currency);
+                    }
+                    await repository.SaveDB();
+                }
+
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Warning(e.Message);
                 // Didn't update
             }
@@ -176,7 +183,7 @@ namespace CryptoZAPI.Controllers {
                 Console.WriteLine($"Excepción {e}");
                 Log.Error(e.Message);
                 // throw Exception
-                
+
             }
 
         }
