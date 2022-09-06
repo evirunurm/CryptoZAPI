@@ -22,6 +22,9 @@ namespace Repo
 
 
         Task CreateRange(IEnumerable<T> range); // throws OperationCanceledException
+
+        Task UpdateRange(IEnumerable<T> range); // throws OperationCanceledException
+
         Task<T> Update(T o);
 
         Task SaveDB();
@@ -55,7 +58,17 @@ namespace Repo
             await dbSet.AddRangeAsync(range);
         }
 
+        public async Task UpdateRange(IEnumerable<T> range)
+        {
+            dbSet.AttachRange(range);
+            foreach (var item in range)
+            {
 
+                 await this.Update(item);
+            }
+
+           
+        }
 
         public IQueryable<T> FindBy(Expression<Func<T, bool>> expression) 
         {

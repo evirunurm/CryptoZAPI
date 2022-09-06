@@ -153,8 +153,17 @@ namespace CryptoZAPI.Controllers {
 
                 List<Currency> CurrenciesToAdd = _mapper.Map<List<Currency>>(NomicsCurrencies);
 
-
                 await repository.CreateRange(CurrenciesToAdd);
+                await repository.SaveDB();
+
+                foreach (Currency currency in CurrenciesToAdd)
+                {
+                     currency.Id = (await repository.FindBy(c => c.Code == currency.Code).ToListAsync())[0].Id;
+                     Console.WriteLine(currency.Id);
+                }
+
+
+                await repository.UpdateRange(CurrenciesToAdd);
                 await repository.SaveDB();
             }
             catch (OperationCanceledException e)
