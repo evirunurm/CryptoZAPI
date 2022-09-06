@@ -34,6 +34,15 @@ namespace Data {
                .HasForeignKey(h => h.UserId);
 			*/
 
+            modelBuilder.Entity<Currency>().
+                HasIndex(c => c.Code).IsUnique();
+
+            modelBuilder.Entity<Country>().
+               HasIndex(c => c.CountryCode).IsUnique();
+
+            modelBuilder.Entity<User>().
+               HasIndex(c => c.Email).IsUnique();
+
             modelBuilder.Entity<History>()
                 .HasOne(h => h.User)
                 .WithMany(u => u.Histories)

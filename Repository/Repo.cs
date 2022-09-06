@@ -45,6 +45,7 @@ namespace Repo
 
         public async Task<T> Create(T o) 
         {
+            dbSet.Attach(o);
             await dbSet.AddAsync(o);
             return o;
         }

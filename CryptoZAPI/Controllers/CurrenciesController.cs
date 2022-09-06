@@ -64,7 +64,7 @@ namespace CryptoZAPI.Controllers {
             // TODO: Add Exceptions
         }
 
-        // GET currencies/{code}
+        // GET currencies/codes/{code}
         [HttpGet("{code}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

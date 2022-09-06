@@ -51,6 +51,8 @@ namespace CryptoZAPI.Controllers {
                 int userId = foundUsers[0].Id;
                 List<History> history = await repository.FindBy(h => h.UserId == userId).ToListAsync();
 
+
+
                 foreach (History h in history)
                 {
                     var foundDestination = await repositoryCurrency.FindBy(c => c.Id == h.DestinationId).ToListAsync();
@@ -124,8 +126,9 @@ namespace CryptoZAPI.Controllers {
                 }
 
                 historyMapped.Origin = foundListCurrencyOrigin[0];
+                historyMapped.OriginId = foundListCurrencyOrigin[0].Id;
+                historyMapped.DestinationId = foundListCurrencyDestination[0].Id;
                 historyMapped.Destination = foundListCurrencyDestination[0];
-
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
 
                 if (history.UserEmail != "") {
@@ -138,6 +141,7 @@ namespace CryptoZAPI.Controllers {
                     }
 
                     historyMapped.User = foundUsers[0];
+                    historyMapped.UserId = foundUsers[0].Id;
                 }
 
                 HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));

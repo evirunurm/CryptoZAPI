@@ -45,6 +45,9 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.ToTable("Currencies");
                 });
 
@@ -101,6 +104,9 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CountryCode")
+                        .IsUnique();
+
                     b.ToTable("Countries");
                 });
 
@@ -130,6 +136,9 @@ namespace Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
