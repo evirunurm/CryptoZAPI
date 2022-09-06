@@ -64,12 +64,12 @@ namespace CryptoZAPI.Controllers {
             // TODO: Add Exceptions
         }
 
-        // GET currencies/codes/{code}
-        [HttpGet("{code}")]
+        // GET currencies/{id}
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindOne(string code) {
+        public async Task<IActionResult> FindById(int id) {
 
            await UpdateDatabase();
 
@@ -78,23 +78,62 @@ namespace CryptoZAPI.Controllers {
             //}
 
             try {
-                var filtered = await repository.FindBy(c => c.Code == code).ToListAsync(); // Must have only one item
+                var foundCurrency = await repository.GetById(id); // Must have only one item
+
+              
+
+                CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(foundCurrency); // MAPPING FROM Currency TO CurrencyForViewDto 
+                
+                return Ok(currency);
+            }
+            catch (ArgumentNullException e) {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+            catch (OperationCanceledException e)
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+
+        }
+
+
+        // GET currencies/{code}
+        [HttpGet("{code:alpha}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyForViewDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> FindByCode(string code)
+        {
+
+            await UpdateDatabase();
+
+            //if (actionResultUpdateDb != null) {
+            //    return actionResultUpdateDb;
+            //}
+
+            try
+            {
+                var filtered = await repository.FindBy(c => c.Code == code.ToUpper()).ToListAsync(); // Must have only one item
 
                 if (filtered.Count == 0)
                 {
                     Log.Warning("Item not found");
                     return NotFound();
-                } else if (filtered.Count > 1)
+                }
+                else if (filtered.Count > 1)
                 {
                     Log.Warning("Too many items found");
                     // TODO: Not valid code
                 }
 
                 CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
-                
+
                 return Ok(currency);
             }
-            catch (ArgumentNullException e) {
+            catch (ArgumentNullException e)
+            {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }

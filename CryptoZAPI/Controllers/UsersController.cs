@@ -15,7 +15,7 @@ namespace CryptoZAPI.Controllers {
     public class UsersController : ControllerBase {
 
         private readonly IRepository<User> repository;
-      
+
 
         private readonly IMapper _mapper;
 
@@ -30,14 +30,14 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
 
-             //List<CountryForCreationDto> CountryCurrencies = await countries.getCountries();
+            //List<CountryForCreationDto> CountryCurrencies = await countries.getCountries();
 
 
 
             try {
                 User userToAdd = _mapper.Map<User>(newUser);
-  
-                
+
+
                 userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
 
                 UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
@@ -79,7 +79,7 @@ namespace CryptoZAPI.Controllers {
 
                 User user = _mapper.Map<User>(updateUser);
                 user.Id = id;
-                
+
 
                 UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(user));
                 await repository.SaveDB();
@@ -99,11 +99,11 @@ namespace CryptoZAPI.Controllers {
         }
 
         // GET
-        [HttpGet]
+        [HttpGet("{UserEmail}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindOne(string UserEmail) {
+        public async Task<IActionResult> FindByMail(string UserEmail) {
             try {
                 var foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
 
@@ -131,5 +131,29 @@ namespace CryptoZAPI.Controllers {
             }
         }
 
+        // GET
+        [HttpGet("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> FindById(int id)
+        {
+            try
+            {
+                var foundUser = await repository.GetById(id);
+                UserForViewDto user = _mapper.Map<UserForViewDto>(foundUser);
+                return Ok(user);
+            }
+            catch (ArgumentNullException e)
+            {
+                Log.Error(e.Message);
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
+            }
+        }
     }
 }

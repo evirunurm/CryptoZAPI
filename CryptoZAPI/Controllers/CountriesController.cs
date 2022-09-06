@@ -71,8 +71,8 @@ namespace CryptoZAPI.Controllers {
             return null;
         }
 
-        // GET countries/code/{countrycode}
-        [HttpGet("code/{countrycode}")]
+        // GET countries/{countrycode}
+        [HttpGet("{countrycode:alpha}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
@@ -85,7 +85,7 @@ namespace CryptoZAPI.Controllers {
             //}
 
             try {
-                var filtered = await repository.FindBy(c => c.CountryCode == countrycode).ToListAsync(); // Must have only one item
+                var filtered = await repository.FindBy(c => c.CountryCode == countrycode.ToUpper()).ToListAsync(); // Must have only one item
 
                 if (filtered.Count == 0)
                 {
@@ -117,7 +117,7 @@ namespace CryptoZAPI.Controllers {
 
 
         // GET countries/{id}
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
@@ -132,20 +132,9 @@ namespace CryptoZAPI.Controllers {
 
             try
             {
-                var filtered = await repository.FindBy(c => c.Id == id).ToListAsync(); // Must have only one item
+                var foundCountry = await repository.GetById(id);
 
-                if (filtered.Count == 0)
-                {
-                    Log.Warning("Item not found");
-                    return NotFound();
-                }
-                else if (filtered.Count > 1)
-                {
-                    Log.Warning("Too many items found");
-                    // TODO: Not valid code
-                }
-
-                CountryForViewDto country = _mapper.Map<CountryForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
+                CountryForViewDto country = _mapper.Map<CountryForViewDto>(foundCountry); // MAPPING FROM Currency TO CurrencyForViewDto 
 
                 return Ok(country);
             }
