@@ -10,20 +10,20 @@ namespace Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(64)]
+        [Required(ErrorMessage = "You should provide a Name value.")]
+        [MaxLength(64, ErrorMessage = "The Name shouldn't have more than 64 characters.")]
         public string Name { get; set; }
 
-        [Required]
-        [MaxLength(320)]
+        [Required(ErrorMessage = "You should provide a Email value.")]
+        [MaxLength(320, ErrorMessage = "The Email shouldn't have more than 320 characters.")]
         [Index(IsUnique = true)]
         public string Email { get; set; }
 
-        [Required]
-        [MinLength(8)]
+        [Required(ErrorMessage = "You should provide a Password value.")]
+        [MinLength(8, ErrorMessage = "The Password shouldn't have less than 8 characters.")]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "You should provide a CountryId value.")]
         public int CountryId { get; set; }
 
         public Country Country { get; set; }

@@ -8,19 +8,16 @@ using System.Text;
 
 namespace Models.DTO {
 
-    [CurrenciesMustBeDifferent(
-         ErrorMessage = "Origin currency and destination currency must be different.")]
-
+    [CurrenciesMustBeDifferent(ErrorMessage = "Origin currency and destination currency must be different.")]
 
     public class HistoryForCreationDto {
-  
         [Required(ErrorMessage = "You should choose a currency.")]
         public string OriginCode { get; set; }
         public string? UserEmail { get; set; }
    
         [Required(ErrorMessage = "You should choose a currency.")]
         public string DestinationCode { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a Value value.")]
         public double Value { get; set; }
     }
 }

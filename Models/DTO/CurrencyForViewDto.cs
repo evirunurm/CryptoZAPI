@@ -9,10 +9,10 @@ namespace Models.DTO {
     public class CurrencyForViewDto {
         [Required(ErrorMessage = "You should provide a Code value.")]
         [Index(IsUnique = true)]
-        [MaxLength(10)]
+        [MaxLength(10, ErrorMessage = "The Code shouldn't have more than 10 characters.")]
         public string Code { get; set; }
         [Required(ErrorMessage = "You should provide a Name value.")]
-        [MaxLength(25)]
+        [MaxLength(25, ErrorMessage = "The Name shouldn't have more than 25 characters.")]
         public string Name { get; set; }
         [Required(ErrorMessage = "You should provide a Price.")]
         public double Price { get; set; }

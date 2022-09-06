@@ -7,16 +7,16 @@ using System.Text.Json.Serialization;
 
 namespace Models.DTO {
     public class CurrencyForCreationDto {
-        [Required]
+        [Required(ErrorMessage = "You should provide an Id value.")]
         [Index(IsUnique = true)]
-        [MaxLength(10)]
+        [MaxLength(10, ErrorMessage = "The Id shouldn't have more than 10 characters.")]
         public string Id { get; set; }
-        [Required]
-        [MaxLength(25)]
+        [Required(ErrorMessage = "You should provide a Name value.")]
+        [MaxLength(25, ErrorMessage = "The Name shouldn't have more than 25 characters.")]
         public string Name { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a Price value.")]
         public double Price { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a price_date value.")]
         public DateTime price_date { get; set; }
         public string? logo_url { get; set; }
     }

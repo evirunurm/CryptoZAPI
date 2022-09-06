@@ -11,21 +11,21 @@ namespace CryptoZAPI.Models
 	{
         [Key]
         public int Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a Value value.")]
         public double Value { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a Result value.")]
         public double Result { get; set; }
         public DateTime Date { get; set; }
       
         // Relations
         public User User { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a UserId value.")]
         public int UserId { get; set; }
         public Currency Origin { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a OriginId value.")]
         public int OriginId { get; set; }
         public Currency Destination { get; set; }
-        [Required]
+        [Required(ErrorMessage = "You should provide a DestinationId value.")]
         public int DestinationId { get; set; }
 
 
