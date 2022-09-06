@@ -7,8 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Models.DTO {
     public class CountryForViewDto {
-        [Key]
-        public int Id { get; set; }
+    
 
         [Required]
         [MaxLength(30)]

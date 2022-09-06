@@ -33,7 +33,7 @@ namespace CryptoZAPI.Controllers {
 
         // GET countries
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Country>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CountryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
@@ -71,12 +71,12 @@ namespace CryptoZAPI.Controllers {
             return null;
         }
 
-        // GET countries/{countrycode}
-        [HttpGet("{countrycode}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Country))]
+        // GET countries/code/{countrycode}
+        [HttpGet("code/{countrycode}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindOne(string countrycode) {
+        public async Task<IActionResult> FindByCode(string countrycode) {
             
            await UpdateDatabase();
 
@@ -97,7 +97,7 @@ namespace CryptoZAPI.Controllers {
                     // TODO: Not valid code
                 }
 
-                Country country = _mapper.Map<Country>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
+                CountryForViewDto country = _mapper.Map<CountryForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
                 
                 return Ok(country);
             }
@@ -114,6 +114,56 @@ namespace CryptoZAPI.Controllers {
             return null;
 
         }
+
+
+        // GET countries/{id}
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountryForViewDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> FindById(int id)
+        {
+
+            await UpdateDatabase();
+
+            //if (actionResultUpdateDb != null) {
+            //    return actionResultUpdateDb;
+            //}
+
+            try
+            {
+                var filtered = await repository.FindBy(c => c.Id == id).ToListAsync(); // Must have only one item
+
+                if (filtered.Count == 0)
+                {
+                    Log.Warning("Item not found");
+                    return NotFound();
+                }
+                else if (filtered.Count > 1)
+                {
+                    Log.Warning("Too many items found");
+                    // TODO: Not valid code
+                }
+
+                CountryForViewDto country = _mapper.Map<CountryForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
+
+                return Ok(country);
+            }
+            catch (ArgumentNullException e)
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+            catch (OperationCanceledException e)
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+            }
+
+            return null;
+
+        }
+
 
         private async Task UpdateDatabase() {
 

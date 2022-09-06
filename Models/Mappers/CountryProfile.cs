@@ -21,7 +21,7 @@ namespace Models.Mappers {
                             opt => opt.MapFrom(src => src.name))
                 .ReverseMap();
 
-            CreateMap<Country, CountryForViewDto>()
+            CreateMap<CountryForViewDto, Country>()
                .ForMember(dest => dest.Id,
                            opt => opt.Ignore())
                .ReverseMap();
