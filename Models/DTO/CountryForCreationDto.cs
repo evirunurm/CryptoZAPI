@@ -10,10 +10,11 @@ namespace Models.DTO {
      
         [Required(ErrorMessage = "You should provide a Name value.")]
         [MaxLength(25, ErrorMessage = "The name shouldn't have more than 25 characters.")]
-        public string name { get; set; }
+        public string name { get; set; } = String.Empty;
+
         [Required(ErrorMessage = "You should provide a alpha2Code value.")]
         [MaxLength(2, ErrorMessage = "The alpha2Code shouldn't have more than 2 characters.")]
-        public string alpha2Code { get; set; }
-    
+        public string alpha2Code { get; set; } = String.Empty;
+
     }
 }

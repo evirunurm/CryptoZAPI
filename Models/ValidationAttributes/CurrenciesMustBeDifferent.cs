@@ -10,7 +10,7 @@ namespace Models.ValidationAttributes
 {
     public class CurrenciesMustBeDifferent : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value,
+        protected override ValidationResult? IsValid(object? value,
           ValidationContext validationContext)
         {
             var history = (HistoryForCreationDto)validationContext.ObjectInstance;

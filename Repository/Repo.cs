@@ -23,9 +23,9 @@ namespace Repo
 
         Task CreateRange(IEnumerable<T> range); // throws OperationCanceledException
 
-        Task UpdateRange(IEnumerable<T> range); // throws OperationCanceledException
+        void UpdateRange(IEnumerable<T> range); // throws OperationCanceledException
 
-        Task<T> Update(T o);
+        T Update(T o);
 
         Task SaveDB();
 
@@ -44,8 +44,6 @@ namespace Repo
             dbSet = _context.Set<T>();
         }
 
-
-
         public async Task<T> Create(T o) 
         {
             dbSet.Attach(o);
@@ -58,16 +56,13 @@ namespace Repo
             await dbSet.AddRangeAsync(range);
         }
 
-        public async Task UpdateRange(IEnumerable<T> range)
+        public void UpdateRange(IEnumerable<T> range)
         {
             dbSet.AttachRange(range);
             foreach (var item in range)
             {
-
-                 await this.Update(item);
-            }
-
-           
+                 this.Update(item);
+            }           
         }
 
         public IQueryable<T> FindBy(Expression<Func<T, bool>> expression) 
@@ -84,7 +79,6 @@ namespace Repo
         {
             var foundObj = await dbSet.FindAsync(id);
             // var foundObj = await dbSet.FirstOrDefaultAsync(t => t.Id == id);
-
             return foundObj ?? throw new KeyNotFoundException();
         }
 
@@ -93,7 +87,7 @@ namespace Repo
             await _context.SaveChangesAsync();
         }
 
-        public async Task<T> Update(T o) // throws KeyNotFoundException
+        public T Update(T o) // throws KeyNotFoundException
         {
             dbSet.Attach(o);
             _context.Entry(o).State = EntityState.Modified;

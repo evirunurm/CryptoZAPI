@@ -16,15 +16,18 @@ namespace CryptoZAPI.Models
         [Required(ErrorMessage = "You should provide a Result value.")]
         public double Result { get; set; }
         public DateTime Date { get; set; }
-      
+
         // Relations
-        public User User { get; set; }
+        public User? User { get; set; }
+        public Currency? Origin { get; set; }
+        public Currency? Destination { get; set; }
+
         [Required(ErrorMessage = "You should provide a UserId value.")]
         public int UserId { get; set; }
-        public Currency Origin { get; set; }
+       
         [Required(ErrorMessage = "You should provide a OriginId value.")]
         public int OriginId { get; set; }
-        public Currency Destination { get; set; }
+                
         [Required(ErrorMessage = "You should provide a DestinationId value.")]
         public int DestinationId { get; set; }
 

@@ -116,6 +116,9 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("Birthdate")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("CountryId")
                         .HasColumnType("INTEGER");
 

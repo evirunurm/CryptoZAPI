@@ -69,31 +69,34 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser) {
             try {
-              
 
-                var foundUsers = await repository.FindBy(u => u.Id == id).ToListAsync();
+
+                List<User> foundUsers = await repository.FindBy(u => u.Id == id).ToListAsync();
 
                 if (foundUsers.Count < 1) {
-                    // Error
+                    return BadRequest();
                 }
-
-                User userToUpdate = foundUsers[0];
-
-                /* TODO Obtener el Country en Users ¿? */
-                var foundCountry = await repositoryCountry.FindBy(u => u.CountryCode == updateUser.CountryCode).ToListAsync();
+             
+                List<Country> foundCountry = await repositoryCountry.FindBy(u => u.CountryCode == updateUser.CountryCode).ToListAsync();
 
                 if (foundCountry.Count < 1) {
-                    // Error
+                    return BadRequest();
                 }
 
                 Country country = foundCountry[0];
-                userToUpdate.Name = updateUser.Name;
-                userToUpdate.Country = country;
-                userToUpdate.CountryId = country.Id;
-                userToUpdate.Password = updateUser.Password;
+                User userToUpdate = foundUsers[0];
 
-                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(userToUpdate));
+                User user = _mapper.Map<User>(updateUser);
+
+                user.Country = country;
+                user.CountryId = country.Id;
+
+                userToUpdate.UpdateFromUser(user);
+
+                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(repository.Update(userToUpdate));
+
                 await repository.SaveDB();
+
                 return Ok(updatedUser);
             }
 
@@ -116,7 +119,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindByMail(string UserEmail) {
             try {
-                var foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
+                List<User> foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
 
                 if (foundUsers.Count == 0) {
                     Log.Warning("No content found");
@@ -127,7 +130,15 @@ namespace CryptoZAPI.Controllers {
                     // Error de argumentos
                 }
 
-                UserForViewDto user = _mapper.Map<UserForViewDto>(foundUsers[0]);
+                User foundUser = foundUsers[0];
+
+                /*  
+                    Tenemos activado el Lazy Loading de Entity FrameWork, así que
+                    no obtenemos los objetos Country al hacer el fetch de User
+                */
+                foundUser.Country = await repositoryCountry.GetById(foundUser.CountryId);
+
+                UserForViewDto user = _mapper.Map<UserForViewDto>(foundUser);
                 return Ok(user);
             }
             catch (ArgumentNullException e) {
@@ -147,7 +158,14 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindById(int id) {
             try {
-                var foundUser = await repository.GetById(id);
+                User foundUser = await repository.GetById(id);
+
+                /*  
+                    Tenemos activado el Lazy Loading de Entity FrameWork, así que
+                    no obtenemos los objetos Country al hacer el fetch de User
+                */
+                foundUser.Country = await repositoryCountry.GetById(foundUser.CountryId);
+
                 UserForViewDto user = _mapper.Map<UserForViewDto>(foundUser);
                 return Ok(user);
             }

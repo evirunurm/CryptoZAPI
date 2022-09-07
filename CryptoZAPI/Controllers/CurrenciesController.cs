@@ -34,16 +34,12 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll() {
 
-            await UpdateDatabase(); // This must just update if needed. not return anything.
-
-            //if (actionResultUpdateDb != null) {
-            //    return actionResultUpdateDb;
-            //}
+            await UpdateDatabase();
 
             try {
                 List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
 
-                if (currencies.Count == 0) {
+                if (currencies.Count < 1) {
                     Log.Warning("No content found");
                     return NoContent();
                 }
@@ -70,14 +66,8 @@ namespace CryptoZAPI.Controllers {
 
             await UpdateDatabase();
 
-            //if (actionResultUpdateDb != null) {
-            //    return actionResultUpdateDb;
-            //}
-
             try {
-                var foundCurrency = await repository.GetById(id); // Must have only one item
-
-
+                var foundCurrency = await repository.GetById(id);
 
                 CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(foundCurrency); // MAPPING FROM Currency TO CurrencyForViewDto 
 
@@ -104,14 +94,10 @@ namespace CryptoZAPI.Controllers {
 
             await UpdateDatabase();
 
-            //if (actionResultUpdateDb != null) {
-            //    return actionResultUpdateDb;
-            //}
-
             try {
                 var filtered = await repository.FindBy(c => c.Code == code.ToUpper()).ToListAsync(); // Must have only one item
 
-                if (filtered.Count == 0) {
+                if (filtered.Count < 1) {
                     Log.Warning("Item not found");
                     return NotFound();
                 }
@@ -158,17 +144,8 @@ namespace CryptoZAPI.Controllers {
                 // TODO CAMBIAR A UNA LAMBDA O ALGO ASÍ.
                 if (currenciesToUpdate.Count > 0) {
                     foreach (Currency currency in currenciesToUpdate) {
-                        
-                        Currency? updatedCurrency = NomicsCurrencies.FirstOrDefault(n => n.Code == currency.Code);
-                        
-                        if (updatedCurrency == null)
-                            continue;
-
-                        currency.PriceDate = updatedCurrency.PriceDate;
-                        currency.Price = updatedCurrency.Price;
-                        currency.Name = updatedCurrency.Name;
-                        currency.LogoUrl = updatedCurrency.LogoUrl;
-                        await repository.Update(currency);
+                        currency.UpdateFromCurrency(NomicsCurrencies.FirstOrDefault(n => n.Code == currency.Code));
+                        repository.Update(currency);
                     }
                     await repository.SaveDB();
                 }

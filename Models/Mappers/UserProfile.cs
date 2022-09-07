@@ -12,18 +12,25 @@ namespace Models.Mappers {
         public UserProfile () {
 
             // <Origen, Destino>
+
+            /* CreationDTO */
             CreateMap<UserForCreationDto, User>()
                 .ForMember(dest => dest.Id,
                             opt => opt.Ignore())            
                 .ReverseMap();
 
-            CreateMap<UserForCreationDto, UserForViewDto>().ReverseMap();
-
+            /* ViewDTO */
             CreateMap<UserForViewDto, User>()
                 .ForMember(dest => dest.Id,
-                            opt => opt.Ignore())
-                .ReverseMap();
+                            opt => opt.Ignore());
 
+            CreateMap<User, UserForViewDto>()
+                .ForMember(dest => dest.CountryCode,
+                            opt => opt.MapFrom(src => src.Country.CountryCode))
+                .ForMember(dest => dest.CountryName,
+                            opt => opt.MapFrom(src => src.Country.Name));
+
+            /* UpdateDTO */
             CreateMap<UserForUpdateDto, User>()
                 .ForMember(dest => dest.Id,
                             opt => opt.Ignore())

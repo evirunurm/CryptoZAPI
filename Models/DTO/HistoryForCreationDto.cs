@@ -12,11 +12,12 @@ namespace Models.DTO {
 
     public class HistoryForCreationDto {
         [Required(ErrorMessage = "You should choose a currency.")]
-        public string OriginCode { get; set; }
-        public string? UserEmail { get; set; }
-   
+        public string OriginCode { get; set; } = String.Empty;
+        public string? UserEmail { get; set; } = String.Empty;
+
         [Required(ErrorMessage = "You should choose a currency.")]
-        public string DestinationCode { get; set; }
+        public string DestinationCode { get; set; } = String.Empty;
+
         [Required(ErrorMessage = "You should provide a Value value.")]
         public double Value { get; set; }
     }
