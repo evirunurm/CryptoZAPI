@@ -32,13 +32,13 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll() {
+        public async Task<IActionResult> GetAll(int limit, int offset) {
 
             await UpdateDatabase();
 
             try {
-                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
-
+                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll().Skip(offset).Take(limit).ToListAsync()); // MAPPING FROM Currency TO CurrencyForViewDto 
+                
                 if (currencies.Count < 1) {
                     Log.Warning("No content found");
                     return NoContent();
@@ -130,7 +130,7 @@ namespace CryptoZAPI.Controllers {
 
             try {
                 List<Currency> NomicsCurrencies = _mapper.Map<List<Currency>>(await nomics.getCurrencies());
-                List<Currency> currenciesInContext = (List<Currency>)await repository.GetAll();
+                List<Currency> currenciesInContext = await repository.GetAll().ToListAsync();
 
                 List<Currency> currenciesToAdd = NomicsCurrencies.ExceptBy(currenciesInContext.Select(c => c.Code),
                                                                               x => x.Code).ToList();
