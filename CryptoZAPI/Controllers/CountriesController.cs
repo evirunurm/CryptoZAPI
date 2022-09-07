@@ -66,9 +66,6 @@ namespace CryptoZAPI.Controllers {
                 Console.WriteLine(e);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            // TODO: Add Exceptions
-           
-            return null;
         }
 
         // GET countries/{countrycode}
@@ -110,9 +107,6 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            
-            return null;
-
         }
 
 
@@ -148,9 +142,6 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-
-            return null;
-
         }
 
 

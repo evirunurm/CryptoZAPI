@@ -23,7 +23,7 @@ namespace Models
         [MinLength(8, ErrorMessage = "The Password shouldn't have less than 8 characters.")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "You should provide a CountryId value.")]
+        //[Required(ErrorMessage = "You should provide a CountryId value.")]
         public int CountryId { get; set; }
 
         public Country Country { get; set; }

@@ -15,13 +15,15 @@ namespace CryptoZAPI.Controllers {
     public class UsersController : ControllerBase {
 
         private readonly IRepository<User> repository;
+        private readonly IRepository<Country> repositoryCountry;
 
 
         private readonly IMapper _mapper;
 
-        public UsersController(IRepository<User> repository, IMapper mapper) {
-            this.repository = repository;
-            this._mapper = mapper;
+        public UsersController(IRepository<User> repository, IRepository<Country> repositoryCountry, IMapper mapper) {
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.repositoryCountry = repositoryCountry ?? throw new ArgumentNullException(nameof(repositoryCountry));
+            this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         // POST users
@@ -29,24 +31,27 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
-
-            //List<CountryForCreationDto> CountryCurrencies = await countries.getCountries();
-
-
-
             try {
+
+                var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
+
+                if (foundCountry.Count < 1) {
+                    // Error
+                }
+
+                Country country = foundCountry[0];
+
                 User userToAdd = _mapper.Map<User>(newUser);
-
-
                 userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
+                userToAdd.Country = country;
+                userToAdd.CountryId = 0;
 
                 UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
 
                 await repository.SaveDB();
                 return Created($"/users", user);
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Error(e.Message);
                 return BadRequest(e.Message);
             }
@@ -64,30 +69,35 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser) {
             try {
+              
 
-                //if (foundUsers.Count == 0)
-                //{
-                //    return NotFound();
-                //}
+                var foundUsers = await repository.FindBy(u => u.Id == id).ToListAsync();
 
-                //if (foundUsers.Count > 1)
-                //{
-                //    // Error de argumentos
-                //}
+                if (foundUsers.Count < 1) {
+                    // Error
+                }
 
-                //int userId = foundUsers[0].Id;
+                User userToUpdate = foundUsers[0];
 
-                User user = _mapper.Map<User>(updateUser);
-                user.Id = id;
+                /* TODO Obtener el Country en Users ¿? */
+                var foundCountry = await repositoryCountry.FindBy(u => u.CountryCode == updateUser.CountryCode).ToListAsync();
 
+                if (foundCountry.Count < 1) {
+                    // Error
+                }
 
-                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(user));
+                Country country = foundCountry[0];
+                userToUpdate.Name = updateUser.Name;
+                userToUpdate.Country = country;
+                userToUpdate.CountryId = country.Id;
+                userToUpdate.Password = updateUser.Password;
+
+                UserForViewDto updatedUser = _mapper.Map<UserForViewDto>(await repository.Update(userToUpdate));
                 await repository.SaveDB();
                 return Ok(updatedUser);
             }
 
-            catch (KeyNotFoundException e)
-            {
+            catch (KeyNotFoundException e) {
                 Log.Warning("No content found");
                 return NotFound();
             }
@@ -99,6 +109,7 @@ namespace CryptoZAPI.Controllers {
         }
 
         // GET
+        // TODO REGEX
         [HttpGet("{UserEmail}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -107,14 +118,12 @@ namespace CryptoZAPI.Controllers {
             try {
                 var foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
 
-                if (foundUsers.Count == 0)
-                {
+                if (foundUsers.Count == 0) {
                     Log.Warning("No content found");
                     return NotFound();
                 }
 
-                if (foundUsers.Count > 1)
-                {
+                if (foundUsers.Count > 1) {
                     // Error de argumentos
                 }
 
@@ -136,21 +145,17 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> FindById(int id)
-        {
-            try
-            {
+        public async Task<IActionResult> FindById(int id) {
+            try {
                 var foundUser = await repository.GetById(id);
                 UserForViewDto user = _mapper.Map<UserForViewDto>(foundUser);
                 return Ok(user);
             }
-            catch (ArgumentNullException e)
-            {
+            catch (ArgumentNullException e) {
                 Log.Error(e.Message);
                 return NotFound();
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }

@@ -15,6 +15,6 @@ namespace Models.DTO {
         public string Password { get; set; }
         [MinLength(8, ErrorMessage = "The Password shouldn't have less than 8 characters.")]
         public string NewPassword { get; set; }
-        public int CountryId { get; set; }  
+        public string CountryCode { get; set; }  
     }
 }
