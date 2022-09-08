@@ -42,7 +42,7 @@ namespace CryptoZAPI.Controllers {
             await UpdateDatabase(); // This must just update if needed. not return anything.           
 
             try {
-                List<CountryForViewDto> countries = _mapper.Map<List<CountryForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
+                List<CountryForViewDto> countries = _mapper.Map<List<CountryForViewDto>>(await repository.GetAll().ToListAsync()); // MAPPING FROM Currency TO CurrencyForViewDto 
                 
                 if (countries.Count == 0)
                 {

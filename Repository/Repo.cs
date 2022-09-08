@@ -7,10 +7,12 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repo {
-    public interface IRepository<T>
-        where T : class {
-        Task<IEnumerable<T>> GetAll();
+namespace Repo
+{
+    public interface IRepository<T> 
+        where T : class
+    {
+        IQueryable<T> GetAll();
         Task<T> GetById(int id);
 
         // Must be IQueryable to do ToListAsync();
@@ -61,9 +63,9 @@ namespace Repo {
             return dbSet.Where(expression);
         }
 
-        public async Task<IEnumerable<T>> GetAll() // throws ArgumentNullException, OperationCanceledException
+        public IQueryable<T> GetAll() // throws ArgumentNullException, OperationCanceledException
         {
-            return await dbSet.ToListAsync();
+            return dbSet;
         }
 
         public async Task<T> GetById(int id) // throws KeyNotFoundException
