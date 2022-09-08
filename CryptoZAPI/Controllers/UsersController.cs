@@ -36,7 +36,7 @@ namespace CryptoZAPI.Controllers {
                 var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
 
                 if (foundCountry.Count < 1) {
-                    // Error
+                    return BadRequest();
                 }
 
                 Country country = foundCountry[0];
@@ -132,7 +132,7 @@ namespace CryptoZAPI.Controllers {
 
                 User foundUser = foundUsers[0];
 
-                /*  
+                /*
                     Tenemos activado el Lazy Loading de Entity FrameWork, así que
                     no obtenemos los objetos Country al hacer el fetch de User
                 */

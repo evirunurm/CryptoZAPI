@@ -19,8 +19,6 @@ namespace CryptoZAPI.Controllers {
         // Mapper
         private readonly IMapper _mapper;
 
-
-
         public CurrenciesController(INomics nomics, IRepository<Currency> repository, IMapper mapper) {
             this.nomics = nomics ?? throw new ArgumentNullException(nameof(nomics));
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -38,8 +36,8 @@ namespace CryptoZAPI.Controllers {
 
             try {
                 List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll().Skip(offset).Take(limit).ToListAsync()); // MAPPING FROM Currency TO CurrencyForViewDto 
-                
-                if (currencies.Count < 1) {
+
+                if (!currencies.Any()) {
                     Log.Warning("No content found");
                     return NoContent();
                 }
@@ -97,14 +95,10 @@ namespace CryptoZAPI.Controllers {
             try {
                 var filtered = await repository.FindBy(c => c.Code == code.ToUpper()).ToListAsync(); // Must have only one item
 
-                if (filtered.Count < 1) {
+                if (!filtered.Any()) {
                     Log.Warning("Item not found");
                     return NotFound();
-                }
-                else if (filtered.Count > 1) {
-                    Log.Warning("Too many items found");
-                    // TODO: Not valid code
-                }
+                }               
 
                 CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
 
@@ -126,27 +120,29 @@ namespace CryptoZAPI.Controllers {
         }
 
         private async Task UpdateDatabase() {
-
-
             try {
                 List<Currency> NomicsCurrencies = _mapper.Map<List<Currency>>(await nomics.getCurrencies());
                 List<Currency> currenciesInContext = await repository.GetAll().ToListAsync();
 
                 List<Currency> currenciesToAdd = NomicsCurrencies.ExceptBy(currenciesInContext.Select(c => c.Code),
                                                                               x => x.Code).ToList();
+
                 List<Currency> currenciesToUpdate = currenciesInContext.IntersectBy(NomicsCurrencies.Select(c => c.Code),
                                                                               x => x.Code).ToList();
-                if (currenciesToAdd.Count > 0) {
+
+                if (currenciesToAdd.Any()) {
                     await repository.CreateRange(currenciesToAdd);
                     await repository.SaveDB();
                 }
 
-                // TODO CAMBIAR A UNA LAMBDA O ALGO ASÍ.
-                if (currenciesToUpdate.Count > 0) {
-                    foreach (Currency currency in currenciesToUpdate) {
-                        currency.UpdateFromCurrency(NomicsCurrencies.FirstOrDefault(n => n.Code == currency.Code));
-                        repository.Update(currency);
-                    }
+                if (currenciesToUpdate.Any()) {
+
+                    currenciesToUpdate.Select(
+                    x => {
+                        x.UpdateFromCurrency(NomicsCurrencies.FirstOrDefault(c => c.Code == x.Code));
+                        return x;
+                    }).ToList();
+
                     await repository.SaveDB();
                 }
 
@@ -160,7 +156,6 @@ namespace CryptoZAPI.Controllers {
                 Console.WriteLine($"Excepción {e}");
                 Log.Error(e.Message);
                 // throw Exception
-
             }
 
         }
