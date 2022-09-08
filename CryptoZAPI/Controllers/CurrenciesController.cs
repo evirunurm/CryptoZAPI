@@ -39,14 +39,14 @@ namespace CryptoZAPI.Controllers {
             try {
                 List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()); // MAPPING FROM Currency TO CurrencyForViewDto 
 
-                if (currencies.Count < 1) {
+                if (!currencies.Any()) {
                     Log.Warning("No content found");
                     return NoContent();
                 }
 
                 return Ok(currencies);
             }
-            catch (ArgumentNullException e) {
+            catch (KeyNotFoundException e) {
                 Console.WriteLine(e);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
@@ -110,7 +110,7 @@ namespace CryptoZAPI.Controllers {
 
                 return Ok(currency);
             }
-            catch (ArgumentNullException e) {
+            catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
@@ -124,7 +124,6 @@ namespace CryptoZAPI.Controllers {
         private bool Equals(Currency a, Currency b) {
             return a.Code == b.Code || a.Id == b.Id;
         }
-
         private async Task UpdateDatabase() {
 
 
@@ -160,9 +159,7 @@ namespace CryptoZAPI.Controllers {
                 Console.WriteLine($"Excepción {e}");
                 Log.Error(e.Message);
                 // throw Exception
-
             }
-
         }
     }
 }

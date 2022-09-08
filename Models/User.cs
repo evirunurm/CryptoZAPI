@@ -3,10 +3,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Models
-{
-    public class User
-    {
+namespace Models {
+    public class User {
         [Key]
         public int Id { get; set; }
 
@@ -28,11 +26,11 @@ namespace Models
 
         /* -- Relations -- */
         public int CountryId { get; set; }
-        public Country? Country { get; set; }
+        public Country Country { get; set; } = new Country();
         public List<History> Histories { get; set; } = new List<History>();
 
-        
-     public void UpdateFromUser(User? user) {
+
+        public void UpdateFromUser(User? user) {
             if (user == null)
                 throw new ArgumentNullException();
 
@@ -40,6 +38,6 @@ namespace Models
             this.Password = user.Password;
             this.Country = user.Country;
             this.CountryId = user.CountryId;
-        }   
+        }
     }
 }

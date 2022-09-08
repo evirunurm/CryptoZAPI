@@ -5,32 +5,23 @@ using Microsoft.Extensions.Configuration;
 using Models.DTO;
 
 namespace NomixServices {
-    public interface INomics
-    {
-        Task<List<CurrencyForCreationDto>> getCurrencies(); 
+    public interface INomics {
+        Task<List<CurrencyForCreationDto>> getCurrencies();
     }
 
-    public class Nomics : INomics
-    {
+    public class Nomics : INomics {
         private readonly HttpClient client;
         private readonly IConfiguration configuration;
 
-        public Nomics(HttpClient client, IConfiguration configuration)
-        {
+        public Nomics(HttpClient client, IConfiguration configuration) {
             this.client = client;
             this.configuration = configuration;
         }
 
-        public async Task<List<CurrencyForCreationDto>> getCurrencies() 
-        {
-            // TODO 
-            // Solucionar que getCurrencies solo haga una llamada cada X tiempo.
-            if (DateTime.Parse(this.configuration["LastUpdatesAPI:nomics"]) >= DateTime.Now.Date )
-            {
-                throw new Exception(); // TODO: Not neecsary to update
-
+        public async Task<List<CurrencyForCreationDto>> getCurrencies() {
+            if (DateTime.Parse(this.configuration["LastUpdatesAPI:nomics"]) >= DateTime.Now.Date) {
+                throw new Exception(); // TODO: Not necesary to update
             }
-
 
             this.configuration["LastUpdatesAPI:nomics"] = DateTime.Now.Date.ToString();
 
@@ -41,7 +32,7 @@ namespace NomixServices {
 
             List<CurrencyForCreationDto> currencies = JsonConvert.DeserializeObject<List<CurrencyForCreationDto>>(info) ??
                 throw new Exception(); // TODO: Json Excpetion
-      
+
             return currencies;
         }
     }

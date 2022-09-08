@@ -12,7 +12,7 @@ class CurrencyMockData
     public static List<Currency> GetAll()
     {
 
-        return null;
+        return new List<Currency>();
         /*
         return new List<Currency>{
              new Currency(

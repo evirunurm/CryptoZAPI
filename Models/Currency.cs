@@ -14,11 +14,11 @@ namespace CryptoZAPI.Models {
         [Index(IsUnique = true)]
         [MaxLength(10, ErrorMessage = "The Code shouldn't have more than 10 characters.")]
         public string Code { get; set; } = string.Empty;
-        
+
         [Required(ErrorMessage = "You should provide a Name value.")]
         [MaxLength(25, ErrorMessage = "The Name shouldn't have more than 25 characters.")]
         public string Name { get; set; } = string.Empty;
-        
+
         [Required(ErrorMessage = "You should provide a Price value.")]
         public double Price { get; set; }
         public DateTime PriceDate { get; set; }

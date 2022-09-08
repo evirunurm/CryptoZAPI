@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Data {
     public class CryptoZContext : DbContext {
-        public DbSet<Currency> Currencies { get; set; }
-        public DbSet<History> Histories { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Country> Countries { get; set; }
+        public DbSet<Currency> Currencies  => Set<Currency>();
+        public DbSet<History> Histories => Set<History>();
+        public DbSet<User> Users => Set<User>();
+        public DbSet<Country> Countries => Set<Country>();
 
         // DB Path
         private string DbPath = $"DB\\SQLite.DB";

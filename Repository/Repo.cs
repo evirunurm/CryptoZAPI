@@ -7,11 +7,9 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repo
-{
-    public interface IRepository<T> 
-        where T : class
-    {
+namespace Repo {
+    public interface IRepository<T>
+        where T : class {
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(int id);
 
@@ -33,40 +31,33 @@ namespace Repo
 
 
     public class Repository<T> : IRepository<T>, IDisposable
-        where T : class
-    {
+        where T : class {
         private DbContext _context;
         private DbSet<T> dbSet;
 
-        public Repository()
-        {
+        public Repository() {
             _context = new CryptoZContext();
             dbSet = _context.Set<T>();
         }
 
-        public async Task<T> Create(T o) 
-        {
+        public async Task<T> Create(T o) {
             dbSet.Attach(o);
             await dbSet.AddAsync(o);
             return o;
         }
 
-        public async Task CreateRange(IEnumerable<T> range) 
-        {
+        public async Task CreateRange(IEnumerable<T> range) {
             await dbSet.AddRangeAsync(range);
         }
 
-        public void UpdateRange(IEnumerable<T> range)
-        {
+        public void UpdateRange(IEnumerable<T> range) {
             dbSet.AttachRange(range);
-            foreach (var item in range)
-            {
-                 this.Update(item);
-            }           
+            foreach (var item in range) {
+                this.Update(item);
+            }
         }
 
-        public IQueryable<T> FindBy(Expression<Func<T, bool>> expression) 
-        {
+        public IQueryable<T> FindBy(Expression<Func<T, bool>> expression) {
             return dbSet.Where(expression);
         }
 
@@ -94,21 +85,15 @@ namespace Repo
             return o;
         }
 
-        public void Dispose()
-        {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) {
                 if (_context != null)
-                {
                     _context.Dispose();
-                    _context = null; // TODO: Check this
-                }
             }
         }
 

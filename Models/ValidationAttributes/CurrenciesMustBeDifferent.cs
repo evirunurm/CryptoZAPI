@@ -13,12 +13,26 @@ namespace Models.ValidationAttributes
         protected override ValidationResult? IsValid(object? value,
           ValidationContext validationContext)
         {
-            var history = (HistoryForCreationDto)validationContext.ObjectInstance;
 
-            if (history.OriginCode == history.DestinationCode)
-            {
-                return new ValidationResult(ErrorMessage,
-                    new[] { nameof(HistoryForCreationDto) });
+            if (value == null)
+                return new ValidationResult($"Object was null");
+
+            if (value.GetType() == typeof(HistoryForCreationDto)) {
+
+                var history = (HistoryForCreationDto)validationContext.ObjectInstance;
+
+                if (history.OriginCode == history.DestinationCode) {
+                    return new ValidationResult(ErrorMessage,
+                        new[] { nameof(HistoryForCreationDto) });
+                }
+            } else if (value.GetType() == typeof(HistoryForCreationDto_Anonymous)) {
+
+                var history = (HistoryForCreationDto_Anonymous)validationContext.ObjectInstance;
+
+                if (history.OriginCode == history.DestinationCode) {
+                    return new ValidationResult(ErrorMessage,
+                        new[] { nameof(HistoryForCreationDto_Anonymous) });
+                }
             }
 
             return ValidationResult.Success;

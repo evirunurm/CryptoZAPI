@@ -8,6 +8,7 @@ using Repo;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using RestCountriesServices;
+using System.Text.RegularExpressions;
 
 namespace CryptoZAPI.Controllers {
     [Route("users")]
@@ -33,10 +34,19 @@ namespace CryptoZAPI.Controllers {
         public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
             try {
 
+                if (!Regex.Match(newUser.Email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$").Success)
+                    ModelState.AddModelError("Email", "Please enter a valid email");               
+
+                if (!ModelState.IsValid) {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
+
                 var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
 
-                if (foundCountry.Count < 1) {
-                    // Error
+                /* DUDA PREGUNTAR EN CLASE */
+                if (!foundCountry.Any()) {
+                    ModelState.AddModelError("Country", "Please enter a Country Code (2 characters)");
+                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
                 }
 
                 Country country = foundCountry[0];
@@ -70,16 +80,20 @@ namespace CryptoZAPI.Controllers {
         public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser) {
             try {
 
+                if (!ModelState.IsValid) {
+                    // return 422 - Unprocessable Entity when validation fails
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
 
                 List<User> foundUsers = await repository.FindBy(u => u.Id == id).ToListAsync();
 
-                if (foundUsers.Count < 1) {
+                if (!foundUsers.Any()) {
                     return BadRequest();
                 }
              
                 List<Country> foundCountry = await repositoryCountry.FindBy(u => u.CountryCode == updateUser.CountryCode).ToListAsync();
 
-                if (foundCountry.Count < 1) {
+                if (!foundCountry.Any()) {
                     return BadRequest();
                 }
 
@@ -101,12 +115,12 @@ namespace CryptoZAPI.Controllers {
             }
 
             catch (KeyNotFoundException e) {
-                Log.Warning("No content found");
+                Log.Warning("No content found: "+e.Message);
                 return NotFound();
             }
             catch (Exception e) // TODO: Change Exception type
             {
-                Log.Error(e.InnerException.Message);
+                Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
             }
         }
@@ -119,15 +133,19 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> FindByMail(string UserEmail) {
             try {
-                List<User> foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
-
-                if (foundUsers.Count == 0) {
-                    Log.Warning("No content found");
-                    return NotFound();
+                if (!Regex.Match(UserEmail, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$").Success) {
+                    ModelState.AddModelError("Email", "Please enter a valid email");
                 }
 
-                if (foundUsers.Count > 1) {
-                    // Error de argumentos
+                if (!ModelState.IsValid) {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
+
+                List<User> foundUsers = await repository.FindBy(u => u.Email == UserEmail).ToListAsync();
+
+                if (!foundUsers.Any()) {
+                    Log.Warning("No content found");
+                    return NotFound();
                 }
 
                 User foundUser = foundUsers[0];
@@ -141,7 +159,7 @@ namespace CryptoZAPI.Controllers {
                 UserForViewDto user = _mapper.Map<UserForViewDto>(foundUser);
                 return Ok(user);
             }
-            catch (ArgumentNullException e) {
+            catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
                 return NotFound();
             }
@@ -169,7 +187,7 @@ namespace CryptoZAPI.Controllers {
                 UserForViewDto user = _mapper.Map<UserForViewDto>(foundUser);
                 return Ok(user);
             }
-            catch (ArgumentNullException e) {
+            catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
                 return NotFound();
             }

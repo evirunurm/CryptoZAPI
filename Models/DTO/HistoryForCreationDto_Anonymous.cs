@@ -10,13 +10,9 @@ namespace Models.DTO {
 
     [CurrenciesMustBeDifferent(ErrorMessage = "Origin currency and destination currency must be different.")]
 
-    public class HistoryForCreationDto {
+    public class HistoryForCreationDto_Anonymous {
         [Required(ErrorMessage = "You should choose a currency.")]
         public string OriginCode { get; set; } = String.Empty;
-
-        [Required(ErrorMessage = "You should provide a Email value.")]
-        [MaxLength(320, ErrorMessage = "The Email shouldn't have more than 320 characters.")]
-        public string? UserEmail { get; set; } = String.Empty;
 
         [Required(ErrorMessage = "You should choose a currency.")]
         public string DestinationCode { get; set; } = String.Empty;
