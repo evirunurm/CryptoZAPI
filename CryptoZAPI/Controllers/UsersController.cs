@@ -73,6 +73,7 @@ namespace CryptoZAPI.Controllers {
         }
 
 
+        // TODO: newPassword, countryCode and name should be optional. 
         // PUT users/5
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
@@ -125,6 +126,7 @@ namespace CryptoZAPI.Controllers {
             }
         }
 
+        // TODO: Should return user Id
         // GET
         // TODO REGEX
         [HttpGet("{UserEmail}")]

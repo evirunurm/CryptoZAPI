@@ -36,10 +36,12 @@ namespace CryptoZAPI.Controllers {
 
             await UpdateDatabase();
 
-            if (filter is null)
-            {
-                filter = "";
-            }
+            filter = filter ?? "";
+
+            //if (filter is null)
+            //{
+            //    filter = "";
+            //}
 
             try {
                 

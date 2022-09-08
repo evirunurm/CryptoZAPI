@@ -27,46 +27,45 @@ namespace CryptoZAPI.Controllers {
         }
 
         // GET
-        [HttpGet]
+        [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HistoryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll(string emailUser, int limit = 0) {
+        public async Task<IActionResult> GetAll(int userId, int limit = int.MaxValue, int offset = 0) {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
 
             try {
 
-                List<HistoryForViewDto> histories;
+                var foundUser = await repositoryUser.GetById(userId);
 
-                var foundUsers = await repositoryUser.FindBy(u => u.Email == emailUser).ToListAsync();
-                if (!foundUsers.Any()) {
-                    Log.Warning("No content found");
+                if (foundUser != null) {
+                    Log.Warning("User not found");
                     NotFound();
                 }
-
-                int userId = foundUsers[0].Id;
                 List<History> history = await repository.FindBy(h => h.UserId == userId).ToListAsync();
 
                 foreach (History h in history) {
-                    var foundDestination = await repositoryCurrency.FindBy(c => c.Id == h.DestinationId).ToListAsync();
-                    if (!foundDestination.Any()) {
-                        Log.Warning("No content found");
+                    var foundDestination = await repositoryCurrency.GetById(h.DestinationId);
+                    if (foundDestination is null) {
+                        Log.Warning("Destination currency not found");
                         NotFound();
                     }
 
-                    var foundOrigin = await repositoryCurrency.FindBy(c => c.Id == h.OriginId).ToListAsync();
-                    if (!foundOrigin.Any()) {
-                        Log.Warning("No content found");
+                    var foundOrigin = await repositoryCurrency.GetById(h.OriginId);
+                    if (foundOrigin is null) {
+                        Log.Warning("Origin currency not found");
                         NotFound();
                     }
 
-                    h.Origin = foundOrigin[0];
-                    h.Destination = foundDestination[0];
+                    h.Origin = foundOrigin;
+                    h.Destination = foundDestination;
                 }
+
+                List<HistoryForViewDto> histories;
                 histories = _mapper.Map<List<HistoryForViewDto>>(history);
 
                 if (!histories.Any()) {
-                    Log.Warning("No content found");
+                    Log.Warning($"No histories found for user with id: {userId}");
                     return NoContent();
                 }
 
@@ -142,11 +141,11 @@ namespace CryptoZAPI.Controllers {
 
 
         // POST
-        [HttpPost("{emailUser}")]
+        [HttpPost("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HistoryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Post(string emailUser, [FromBody] HistoryForCreationDto history) {
+        public async Task<IActionResult> Post(int userId, [FromBody] HistoryForCreationDto history) {
             try {
 
                 if (!ModelState.IsValid) {
@@ -155,11 +154,11 @@ namespace CryptoZAPI.Controllers {
 
                 History historyMapped = _mapper.Map<History>(history);
 
-                var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode).ToListAsync();
-                var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode).ToListAsync();
-                var foundUsers = await repositoryUser.FindBy(u => u.Email == emailUser).ToListAsync();
+                var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode.ToUpper()).ToListAsync();
+                var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode.ToUpper()).ToListAsync();
+                var foundUser = await repositoryUser.GetById(userId);
       
-                if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any() || !foundUsers.Any()) {
+                if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any() || foundUser is null) {
                     Log.Warning("No content found");
                     return NotFound(); // TODO: Edit
                 }
@@ -169,8 +168,7 @@ namespace CryptoZAPI.Controllers {
                 historyMapped.DestinationId = foundListCurrencyDestination[0].Id;
                 historyMapped.Destination = foundListCurrencyDestination[0];
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
-                historyMapped.User = foundUsers[0];
-                historyMapped.UserId = foundUsers[0].Id;
+                historyMapped.UserId = foundUser.Id;
 
                 HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));
                 await repository.SaveDB();
