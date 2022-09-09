@@ -28,7 +28,7 @@ namespace Models {
         public int CountryId { get; set; }
         public Country Country { get; set; } = new Country();
         public List<History> Histories { get; set; } = new List<History>();
-
+        public List<UserCurrency> UsersCurrencies { get; set; } = new List<UserCurrency>();
 
         public void UpdateFromUser(User? user) {
             if (user == null)

@@ -27,6 +27,7 @@ namespace CryptoZAPI.Models {
         // Relations
         public List<History> HistoriesOrigin { get; set; } = new List<History>();
         public List<History> HistoriesDestination { get; set; } = new List<History>();
+        public List<UserCurrency> UsersCurrencies { get; set; } = new List<UserCurrency>();
 
 
         public void UpdateFromCurrency(Currency? currency) {

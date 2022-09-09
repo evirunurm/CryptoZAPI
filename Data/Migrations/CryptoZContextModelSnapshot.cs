@@ -86,6 +86,25 @@ namespace Data.Migrations
                     b.ToTable("Histories");
                 });
 
+            modelBuilder.Entity("CryptoZAPI.Models.UserCurrency", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "CurrencyId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.ToTable("UsersCurrencies");
+                });
+
             modelBuilder.Entity("Models.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -173,6 +192,25 @@ namespace Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CryptoZAPI.Models.UserCurrency", b =>
+                {
+                    b.HasOne("CryptoZAPI.Models.Currency", "Currency")
+                        .WithMany("UsersCurrencies")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Models.User", "User")
+                        .WithMany("UsersCurrencies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.HasOne("Models.Country", "Country")
@@ -189,6 +227,8 @@ namespace Data.Migrations
                     b.Navigation("HistoriesDestination");
 
                     b.Navigation("HistoriesOrigin");
+
+                    b.Navigation("UsersCurrencies");
                 });
 
             modelBuilder.Entity("Models.Country", b =>
@@ -199,6 +239,8 @@ namespace Data.Migrations
             modelBuilder.Entity("Models.User", b =>
                 {
                     b.Navigation("Histories");
+
+                    b.Navigation("UsersCurrencies");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,37 +11,45 @@ using System.Threading.Tasks;
 
 namespace Data {
     public class CryptoZContext : DbContext {
-        public DbSet<Currency> Currencies  => Set<Currency>();
+        public DbSet<Currency> Currencies => Set<Currency>();
         public DbSet<History> Histories => Set<History>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Country> Countries => Set<Country>();
+        public DbSet<UserCurrency> UsersCurrencies => Set<UserCurrency>();
 
         // DB Path
         private string DbPath = $"DB\\SQLite.DB";
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-
             //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
             optionsBuilder.UseSqlite($"Data Source={DbPath}");
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            /*
-            modelBuilder.Entity<User>()
-               .HasMany(u => u.Histories)
-               .WithOne(h => h.User)
-               .HasForeignKey(h => h.UserId);
-			*/
+
+            modelBuilder.Entity<UserCurrency>()
+                .HasKey(uc => new { uc.UserId, uc.CurrencyId });
+
+            modelBuilder.Entity<UserCurrency>()
+                .HasOne(uc => uc.User)
+                .WithMany(u => u.UsersCurrencies)
+                .HasForeignKey(uc => uc.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UserCurrency>()
+                .HasOne(uc => uc.Currency)
+                .WithMany(c => c.UsersCurrencies)
+                .HasForeignKey(uc => uc.CurrencyId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Currency>().
                 HasIndex(c => c.Code).IsUnique();
 
             modelBuilder.Entity<Country>().
-               HasIndex(c => c.CountryCode).IsUnique();
+                HasIndex(c => c.CountryCode).IsUnique();
 
             modelBuilder.Entity<User>().
-               HasIndex(c => c.Email).IsUnique();
+                HasIndex(c => c.Email).IsUnique();
 
             modelBuilder.Entity<History>()
                 .HasOne(h => h.User)
@@ -62,10 +70,10 @@ namespace Data {
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<User>()
-              .HasOne(u => u.Country)
-              .WithMany(c => c.Users)
-              .HasForeignKey(u => u.CountryId)
-              .OnDelete(DeleteBehavior.SetNull);
+                .HasOne(u => u.Country)
+                .WithMany(c => c.Users)
+                .HasForeignKey(u => u.CountryId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

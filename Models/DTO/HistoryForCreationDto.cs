@@ -14,10 +14,6 @@ namespace Models.DTO {
         [Required(ErrorMessage = "You should choose an origin currency.")]
         public string OriginCode { get; set; } = String.Empty;
 
-        [Required(ErrorMessage = "You should provide a Email value.")]
-        [MaxLength(320, ErrorMessage = "The Email shouldn't have more than 320 characters.")]
-        public string? UserEmail { get; set; } = String.Empty;
-
         [Required(ErrorMessage = "You should choose a destination currency.")]
         public string DestinationCode { get; set; } = String.Empty;
 
