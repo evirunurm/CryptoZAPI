@@ -16,6 +16,11 @@ namespace Models.Mappers {
                             opt => opt.Ignore())
                 .ReverseMap();
 
+            CreateMap<HistoryForCreationDto_Anonymous, History>()
+               .ForMember(dest => dest.Id,
+                           opt => opt.Ignore())
+               .ReverseMap();
+
             CreateMap<History, HistoryForViewDto>()
                 .ForMember(dest => dest.OriginCode,
                             opt => opt.MapFrom(src => src.Origin.Code))

@@ -30,27 +30,49 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll(int limit, int offset) {
+        public async Task<IActionResult> GetAll(int limit = int.MaxValue, int offset = 0, string? filter = "" ) {
 
             await UpdateDatabase();
 
-            try {
-                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll().Skip(offset).Take(limit).ToListAsync()); // MAPPING FROM Currency TO CurrencyForViewDto 
+            filter = filter ?? "";
 
-                if (!currencies.Any()) {
+            //if (filter is null)
+            //{
+            //    filter = "";
+            //}
+
+            try {
+                
+
+                List<CurrencyForViewDto> currencies = _mapper.Map<List<CurrencyForViewDto>>(await repository.GetAll()
+                    .Where(currency =>
+                        currency.Code.ToUpper().Contains(filter.ToUpper()) ||
+                        currency.Name.ToUpper().Contains(filter.ToUpper())
+                    )
+                    .Skip(offset)
+                    .Take(limit)
+                    .ToListAsync()
+                ); // MAPPING FROM Currency TO CurrencyForViewDto 
+                
+                if (currencies.Count < 1) {
                     Log.Warning("No content found");
                     return NoContent();
                 }
 
                 return Ok(currencies);
             }
-            catch (ArgumentNullException e) {
+            catch (KeyNotFoundException e) {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
             catch (OperationCanceledException e) {
                 Console.WriteLine(e);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
             // TODO: Add Exceptions
         }
@@ -73,11 +95,11 @@ namespace CryptoZAPI.Controllers {
             }
             catch (ArgumentNullException e) {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
             catch (OperationCanceledException e) {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
 
         }
@@ -104,13 +126,13 @@ namespace CryptoZAPI.Controllers {
 
                 return Ok(currency);
             }
-            catch (ArgumentNullException e) {
+            catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
             catch (OperationCanceledException e) {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
 
         }
@@ -118,7 +140,6 @@ namespace CryptoZAPI.Controllers {
         private bool Equals(Currency a, Currency b) {
             return a.Code == b.Code || a.Id == b.Id;
         }
-
         private async Task UpdateDatabase() {
             try {
                 List<Currency> NomicsCurrencies = _mapper.Map<List<Currency>>(await nomics.getCurrencies());
@@ -157,7 +178,6 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 // throw Exception
             }
-
         }
     }
 }

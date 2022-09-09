@@ -27,75 +27,56 @@ namespace CryptoZAPI.Controllers {
         }
 
         // GET
-        [HttpGet]
+        [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HistoryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll(string emailUser, int limit = 0) {
+        public async Task<IActionResult> GetAll(int userId, int limit = int.MaxValue, int offset = 0) {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
 
             try {
 
-                List<HistoryForViewDto> histories;
+                var foundUser = await repositoryUser.GetById(userId);
 
-                var foundUsers = await repositoryUser.FindBy(u => u.Email == emailUser).ToListAsync();
-                if (foundUsers.Count == 0)
-                {
-                    Log.Warning("No content found");
+                if (foundUser != null) {
+                    Log.Warning("User not found");
                     NotFound();
-                } else if (foundUsers.Count > 1)
-                {
-                    // TODO: Error en el argumento
                 }
-
-                int userId = foundUsers[0].Id;
                 List<History> history = await repository.FindBy(h => h.UserId == userId).ToListAsync();
 
-
-
-                foreach (History h in history)
-                {
-                    var foundDestination = await repositoryCurrency.FindBy(c => c.Id == h.DestinationId).ToListAsync();
-                    if (foundDestination.Count == 0)
-                    {
-                        Log.Warning("No content found");
+                foreach (History h in history) {
+                    var foundDestination = await repositoryCurrency.GetById(h.DestinationId);
+                    if (foundDestination is null) {
+                        Log.Warning("Destination currency not found");
                         NotFound();
                     }
-                    else if (foundDestination.Count > 1)
-                    {
-                        // TODO: Error en el argumento
-                    }
-                    var foundOrigin = await repositoryCurrency.FindBy(c => c.Id == h.OriginId).ToListAsync();
-                    if (foundOrigin.Count == 0)
-                    {
-                        Log.Warning("No content found");
+
+                    var foundOrigin = await repositoryCurrency.GetById(h.OriginId);
+                    if (foundOrigin is null) {
+                        Log.Warning("Origin currency not found");
                         NotFound();
                     }
-                    else if (foundOrigin.Count > 1)
-                    {
-                        // TODO: Error en el argumento
-                    }
 
-                    h.Origin = foundOrigin[0];
-                    h.Destination = foundDestination[0];
+                    h.Origin = foundOrigin;
+                    h.Destination = foundDestination;
                 }
+
+                List<HistoryForViewDto> histories;
                 histories = _mapper.Map<List<HistoryForViewDto>>(history);
 
-                if (histories.Count == 0) {
-                    Log.Warning("No content found");
+                if (!histories.Any()) {
+                    Log.Warning($"No histories found for user with id: {userId}");
                     return NoContent();
                 }
 
                 return Ok(histories);
 
             }
-            catch (ArgumentNullException e)
-            {
+            catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
@@ -106,21 +87,29 @@ namespace CryptoZAPI.Controllers {
             }
         }
 
-        // POST
+        /*
+            IDEA
+            Hacer 2 POST:
+                Uno que sea History/{id o email usuario} -> Guardar la conversion
+                Otro que sea History -> No guardar la conversión (para no registrados por ejemplo)
+         */
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HistoryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Post([FromBody] HistoryForCreationDto history) {
+        public async Task<IActionResult> Post([FromBody] HistoryForCreationDto_Anonymous history) {
             try {
+
+                if (!ModelState.IsValid) {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
 
                 History historyMapped = _mapper.Map<History>(history);
 
                 var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode).ToListAsync();
                 var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode).ToListAsync();
 
-                if (foundListCurrencyOrigin.Count == 0 || foundListCurrencyDestination.Count == 0)
-                {
+                if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any()) {
                     Log.Warning("No content found");
                     return NotFound(); // TODO: Edit
                 }
@@ -131,31 +120,15 @@ namespace CryptoZAPI.Controllers {
                 historyMapped.Destination = foundListCurrencyDestination[0];
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
 
-                if (history.UserEmail != "") {
-
-                    var foundUsers = await repositoryUser.FindBy(u => u.Email == history.UserEmail).ToListAsync();
-                    if (foundUsers.Count == 0)
-                    {
-                        Log.Warning("No content found");
-                        return NotFound(); // TODO: Edit
-                    }
-
-                    historyMapped.User = foundUsers[0];
-                    historyMapped.UserId = foundUsers[0].Id;
-                }
-
-                HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));
-                await repository.SaveDB();
+                HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(historyMapped);
 
                 return Ok(historyDto);
             }
-            catch (ArgumentNullException e)
-            {
+            catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
             }
@@ -163,6 +136,57 @@ namespace CryptoZAPI.Controllers {
             {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
+            }
+        }
+
+
+        // POST
+        [HttpPost("{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HistoryForViewDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> Post(int userId, [FromBody] HistoryForCreationDto history) {
+            try {
+
+                if (!ModelState.IsValid) {
+                    return new UnprocessableEntityObjectResult(ModelState);
+                }
+
+                History historyMapped = _mapper.Map<History>(history);
+
+                var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode.ToUpper()).ToListAsync();
+                var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode.ToUpper()).ToListAsync();
+                var foundUser = await repositoryUser.GetById(userId);
+      
+                if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any()) {
+                    Log.Warning("A currency was not found");
+                    return NotFound();
+                }
+
+                historyMapped.Origin = foundListCurrencyOrigin[0];
+                historyMapped.OriginId = foundListCurrencyOrigin[0].Id;
+                historyMapped.DestinationId = foundListCurrencyDestination[0].Id;
+                historyMapped.Destination = foundListCurrencyDestination[0];
+                historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
+                historyMapped.UserId = foundUser.Id;
+
+                HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));
+                await repository.SaveDB();
+
+                return Ok(historyDto);
+            }
+            catch (KeyNotFoundException e) {
+                Log.Error(e.Message);
+                return NotFound();
+            }
+            catch (OperationCanceledException e) {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
+            }
+            catch (Exception e) // TODO: Change Exception type
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
 

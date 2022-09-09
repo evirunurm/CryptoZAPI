@@ -44,7 +44,7 @@ public static class Startup
                     if ((context.ModelState.ErrorCount > 0) &&
                         (actionExecutingContext?.ActionArguments.Count == context.ActionDescriptor.Parameters.Count))
                     {
-                        problemDetails.Type = "https://courselibrary.com/modelvalidationproblem";
+                        problemDetails.Type = "CryptoZ API";
                         problemDetails.Status = StatusCodes.Status422UnprocessableEntity;
                         problemDetails.Title = "One or more validation errors occurred.";
 

@@ -2,10 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Models
-{
-    public class Country
-    {
+namespace Models {
+    public class Country {
         [Key]
         public int Id { get; set; }
 
