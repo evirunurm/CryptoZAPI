@@ -158,9 +158,9 @@ namespace CryptoZAPI.Controllers {
                 var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode.ToUpper()).ToListAsync();
                 var foundUser = await repositoryUser.GetById(userId);
       
-                if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any() || foundUser is null) {
-                    Log.Warning("No content found");
-                    return NotFound(); // TODO: Edit
+                if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any()) {
+                    Log.Warning("A currency was not found");
+                    return NotFound();
                 }
 
                 historyMapped.Origin = foundListCurrencyOrigin[0];
@@ -177,16 +177,16 @@ namespace CryptoZAPI.Controllers {
             }
             catch (KeyNotFoundException e) {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return NotFound();
             }
             catch (OperationCanceledException e) {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message); ;
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
             catch (Exception e) // TODO: Change Exception type
             {
                 Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
         }
 
