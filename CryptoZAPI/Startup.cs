@@ -1,6 +1,7 @@
 ﻿using CryptoZAPI.Models;
 using Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
@@ -28,6 +29,10 @@ public static class Startup
             .AddSqlite<CryptoZContext>($"Data Source={DbPath}")
             .AddIdentityCore<User>()
             .AddEntityFrameworkStores<CryptoZContext>();
+
+        //builder.Services.AddIdentity<User, IdentityRole>()
+        //        .AddEntityFrameworkStores<CryptoZContext>()
+        //        .AddDefaultTokenProviders();
 
         builder.Services
         .AddHttpContextAccessor()

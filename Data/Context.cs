@@ -9,9 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Data.Roles;
 
 namespace Data {
-    public class CryptoZContext : IdentityDbContext<User> {
+    public class CryptoZContext : IdentityDbContext<User, UserRole, int> {
         public DbSet<Currency> Currencies => Set<Currency>();
         public DbSet<History> Histories => Set<History>();
         // public DbSet<User> Users => Set<User>();
@@ -36,6 +38,8 @@ namespace Data {
         //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
+
+            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserCurrency>()
                 .HasKey(uc => new { uc.UserId, uc.CurrencyId });

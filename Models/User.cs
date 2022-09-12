@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Models {
-    public class User : IdentityUser<string>
+    public class User : IdentityUser<int>
     {
 
         [Required(ErrorMessage = "You should provide a Name value.")]

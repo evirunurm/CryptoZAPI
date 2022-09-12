@@ -23,7 +23,7 @@ namespace CryptoZAPI.Models {
         public Currency Destination { get; set; } = new Currency();
 
         [Required(ErrorMessage = "You should provide a UserId value.")]
-        public string UserId { get; set; } = String.Empty;
+        public int UserId { get; set; }
 
         [Required(ErrorMessage = "You should provide a OriginId value.")]
         public int OriginId { get; set; }
