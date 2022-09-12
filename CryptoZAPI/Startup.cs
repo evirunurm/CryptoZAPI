@@ -1,11 +1,15 @@
 ﻿using CryptoZAPI.Models;
+using Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.Mappers;
 using NomixServices;
 using Repo;
 using RestCountriesServices;
+using System.Text;
 
 public static class Startup
 {
@@ -16,6 +20,33 @@ public static class Startup
         // AutoMapper
         //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile), typeof(CountryProfile));
+                
+        // DB Path
+        string DbPath = $"DB\\SQLite.DB";
+
+        builder.Services
+            .AddSqlite<CryptoZContext>($"Data Source={DbPath}")
+            .AddIdentityCore<User>()
+            .AddEntityFrameworkStores<CryptoZContext>();
+
+        builder.Services
+        .AddHttpContextAccessor()
+        .AddAuthorization()
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            };
+        });
+
 
         // Controllers
         builder.Services.AddControllers()

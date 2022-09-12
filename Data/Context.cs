@@ -1,4 +1,5 @@
 ﻿using CryptoZAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -10,20 +11,29 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data {
-    public class CryptoZContext : DbContext {
+    public class CryptoZContext : IdentityDbContext<User> {
         public DbSet<Currency> Currencies => Set<Currency>();
         public DbSet<History> Histories => Set<History>();
-        public DbSet<User> Users => Set<User>();
+        // public DbSet<User> Users => Set<User>();
         public DbSet<Country> Countries => Set<Country>();
         public DbSet<UserCurrency> UsersCurrencies => Set<UserCurrency>();
 
-        // DB Path
-        private string DbPath = $"DB\\SQLite.DB";
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
-            optionsBuilder.UseSqlite($"Data Source={DbPath}");
+
+        public CryptoZContext(DbContextOptions options) : base(options)
+        {
+
         }
+
+        public CryptoZContext()
+        {
+
+        }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        //    //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
+        //    optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
@@ -48,8 +58,11 @@ namespace Data {
             modelBuilder.Entity<Country>().
                 HasIndex(c => c.CountryCode).IsUnique();
 
-            modelBuilder.Entity<User>().
-                HasIndex(c => c.Email).IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(c => c.Email).IsUnique();
+                
+            //modelBuilder.Entity<User>()
+            //    .HasKey(u => u.Id);
 
             modelBuilder.Entity<History>()
                 .HasOne(h => h.User)

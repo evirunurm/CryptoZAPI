@@ -52,7 +52,7 @@ namespace CryptoZAPI.Controllers {
                 Country country = foundCountry[0];
 
                 User userToAdd = _mapper.Map<User>(newUser);
-                userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
+                // userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
                 userToAdd.Country = country;
                 userToAdd.CountryId = 0;
 
@@ -78,7 +78,7 @@ namespace CryptoZAPI.Controllers {
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser) {
+        public async Task<IActionResult> Put(string id, [FromBody] UserForUpdateDto updateUser) {
             try {
 
                 if (!ModelState.IsValid) {

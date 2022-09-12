@@ -31,12 +31,12 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HistoryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetAll(int userId, int limit = int.MaxValue, int offset = 0) {
+        public async Task<IActionResult> GetAll(string userId, int limit = int.MaxValue, int offset = 0) {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
 
             try {
 
-                var foundUser = await repositoryUser.GetById(userId);
+                var foundUser = new User(); // await repositoryUser.GetById(userId);
 
                 if (foundUser != null) {
                     Log.Warning("User not found");
