@@ -8,6 +8,7 @@ using Repo;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CryptoZAPI.Controllers {
     [Route("currencies")]
@@ -31,6 +32,7 @@ namespace CryptoZAPI.Controllers {
 
         // GET currencies
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]

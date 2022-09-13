@@ -3,42 +3,39 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Roles;
 // using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Data.Roles;
 
-namespace Data {
+namespace Models {
     public class CryptoZContext : IdentityDbContext<User, UserRole, int> {
         public DbSet<Currency> Currencies => Set<Currency>();
         public DbSet<History> Histories => Set<History>();
-        // public DbSet<User> Users => Set<User>();
+        public DbSet<User> Users => Set<User>();
         public DbSet<Country> Countries => Set<Country>();
         public DbSet<UserCurrency> UsersCurrencies => Set<UserCurrency>();
 
+        // DB Path
+        private string DbPath = $"DB\\SQLite.DB";
 
-
-        public CryptoZContext(DbContextOptions options) : base(options)
-        {
-
-        }
-
-        public CryptoZContext()
-        {
+        public CryptoZContext() : base() {
 
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        //    //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
-        //    optionsBuilder.UseSqlite($"Data Source={DbPath}");
-        //}
+        public CryptoZContext(DbContextOptions<CryptoZContext> optionsBuilder) : base(optionsBuilder) {
+
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.UseSqlite($"Data Source={DbPath}");
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
-
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserCurrency>()
@@ -62,11 +59,8 @@ namespace Data {
             modelBuilder.Entity<Country>().
                 HasIndex(c => c.CountryCode).IsUnique();
 
-            modelBuilder.Entity<User>()
-                .HasIndex(c => c.Email).IsUnique();
-                
-            //modelBuilder.Entity<User>()
-            //    .HasKey(u => u.Id);
+            modelBuilder.Entity<User>().
+                HasIndex(c => c.Email).IsUnique();
 
             modelBuilder.Entity<History>()
                 .HasOne(h => h.User)

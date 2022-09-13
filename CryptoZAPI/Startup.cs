@@ -1,65 +1,63 @@
 ﻿using CryptoZAPI.Models;
-using Data;
+using Models;
+using Models.Roles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
-using Models;
 using Models.Mappers;
 using NomixServices;
 using Repo;
 using RestCountriesServices;
 using System.Text;
+using Microsoft.IdentityModel.Logging;
 
-public static class Startup
-{
+public static class Startup {
 
-    public static void ConfigureServices(this WebApplicationBuilder builder)
-    {
+    public static void ConfigureServices(this WebApplicationBuilder builder) {
+
+        builder.Services
+      .AddHttpContextAccessor()
+      .AddAuthorization()
+      .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+      .AddJwtBearer(options => {
+          options.TokenValidationParameters = new TokenValidationParameters {
+              ValidateIssuer = true,
+              ValidateAudience = true,
+              ValidateLifetime = true,
+              ValidateIssuerSigningKey = true,
+              ValidIssuer = builder.Configuration["Jwt:Issuer"],
+              ValidAudience = builder.Configuration["Jwt:Audience"],
+              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+          };
+      });
+
 
         // AutoMapper
         //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile), typeof(CountryProfile));
-                
+
         // DB Path
         string DbPath = $"DB\\SQLite.DB";
 
         builder.Services
-            .AddSqlite<CryptoZContext>($"Data Source={DbPath}")
-            .AddIdentityCore<User>()
-            .AddEntityFrameworkStores<CryptoZContext>();
+            .AddSqlite<CryptoZContext>($"Data Source={DbPath}");
 
-        //builder.Services.AddIdentity<User, IdentityRole>()
-        //        .AddEntityFrameworkStores<CryptoZContext>()
-        //        .AddDefaultTokenProviders();
+        builder.Services.AddIdentityCore<User>(options => {
+            options.Password.RequiredLength = 8;
+        })
+        .AddRoles<UserRole>()
+        .AddEntityFrameworkStores<CryptoZContext>();
 
-        builder.Services
-        .AddHttpContextAccessor()
-        .AddAuthorization()
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                ValidAudience = builder.Configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-            };
-        });
+      
 
 
         // Controllers
         builder.Services.AddControllers()
             .AddXmlDataContractSerializerFormatters().
-            ConfigureApiBehaviorOptions(setupAction =>
-            {
-                setupAction.InvalidModelStateResponseFactory = context =>
-                {
+            ConfigureApiBehaviorOptions(setupAction => {
+                setupAction.InvalidModelStateResponseFactory = context => {
                     // create a problem details objectk
                     var problemDetailsFactory = context.HttpContext.RequestServices
                         .GetRequiredService<ProblemDetailsFactory>();
@@ -78,14 +76,12 @@ public static class Startup
                     // if there are modelstate errors & all keys were correctly
                     // found/parsed we're dealing with validation errors
                     if ((context.ModelState.ErrorCount > 0) &&
-                        (actionExecutingContext?.ActionArguments.Count == context.ActionDescriptor.Parameters.Count))
-                    {
+                        (actionExecutingContext?.ActionArguments.Count == context.ActionDescriptor.Parameters.Count)) {
                         problemDetails.Type = "CryptoZ API";
                         problemDetails.Status = StatusCodes.Status422UnprocessableEntity;
                         problemDetails.Title = "One or more validation errors occurred.";
 
-                        return new UnprocessableEntityObjectResult(problemDetails)
-                        {
+                        return new UnprocessableEntityObjectResult(problemDetails) {
                             ContentTypes = { "application/problem+json" }
                         };
                     }
@@ -94,8 +90,7 @@ public static class Startup
                     // we're dealing with null/unparsable input
                     problemDetails.Status = StatusCodes.Status400BadRequest;
                     problemDetails.Title = "One or more errors on input occurred.";
-                    return new BadRequestObjectResult(problemDetails)
-                    {
+                    return new BadRequestObjectResult(problemDetails) {
                         ContentTypes = { "application/problem+json" }
                     };
                 };
@@ -116,32 +111,26 @@ public static class Startup
 
 
         // Nomics
-        builder.Services.AddHttpClient<INomics, Nomics>(client =>
-        {
+        builder.Services.AddHttpClient<INomics, Nomics>(client => {
             client.BaseAddress = new Uri("https://api.nomics.com/v1/");
         });
 
         // RestCountries
-        builder.Services.AddHttpClient<IRestCountries, RestCountries>(client =>
-        {
+        builder.Services.AddHttpClient<IRestCountries, RestCountries>(client => {
             client.BaseAddress = new Uri("https://restcountries.com/v2/");
         });
     }
 
-    public static void Configure(this WebApplication app)
-    {
-        if (app.Environment.IsDevelopment())
-        {
+    public static void Configure(this WebApplication app) {
+        if (app.Environment.IsDevelopment()) {
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseDeveloperExceptionPage();
+            IdentityModelEventSource.ShowPII = true;
         }
-        else
-        {
-            app.UseExceptionHandler(appBuilder =>
-            {
-                appBuilder.Run(async context =>
-                {
+        else {
+            app.UseExceptionHandler(appBuilder => {
+                appBuilder.Run(async context => {
                     context.Response.StatusCode = 500;
                     await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
                 });
@@ -150,17 +139,16 @@ public static class Startup
         }
 
         // Shows UseCors with CorsPolicyBuilder.
-        app.UseCors(builder =>
-        {
+        app.UseCors(builder => {
             builder.AllowAnyOrigin()
                    .AllowAnyMethod()
                    .AllowAnyHeader();
         });
 
-        app.UseHttpsRedirection();
-
+        app.UseAuthentication();
         app.UseAuthorization();
-
+        app.UseHttpsRedirection();
         app.MapControllers();
     }
 }
+

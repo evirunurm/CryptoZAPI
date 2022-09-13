@@ -27,6 +27,8 @@ namespace CryptoZAPI.Controllers {
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        public record AuthenticateRequest(string UserEmail, string Password);
+
         // POST users
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
