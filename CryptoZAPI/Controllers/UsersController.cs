@@ -30,53 +30,54 @@ namespace CryptoZAPI.Controllers {
         public record AuthenticateRequest(string UserEmail, string Password);
 
         // POST users
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
-            try {
+        //[HttpPost]
+        //[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
+        //[ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        //public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
+        //    try {
 
-                if (!Regex.Match(newUser.Email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$").Success)
-                    ModelState.AddModelError("Email", "Please enter a valid email");               
+        //        if (!Regex.Match(newUser.Email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$").Success)
+        //            ModelState.AddModelError("Email", "Please enter a valid email");               
 
-                if (!ModelState.IsValid) {
-                    return new UnprocessableEntityObjectResult(ModelState);
-                }
+        //        if (!ModelState.IsValid) {
+        //            return new UnprocessableEntityObjectResult(ModelState);
+        //        }
 
-                var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
+        //        var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
 
-                /* DUDA PREGUNTAR EN CLASE */
-                if (!foundCountry.Any()) {
-                    ModelState.AddModelError("Country", "Please enter a Country Code (2 characters)");
-                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
-                }
+        //        /* DUDA PREGUNTAR EN CLASE */
+        //        if (!foundCountry.Any()) {
+        //            ModelState.AddModelError("Country", "Please enter a Country Code (2 characters)");
+        //            return BadRequest(new UnprocessableEntityObjectResult(ModelState));
+        //        }
 
-                Country country = foundCountry[0];
+        //        Country country = foundCountry[0];
 
-                User userToAdd = _mapper.Map<User>(newUser);
-                // userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
-                userToAdd.Country = country;
-                userToAdd.CountryId = 0;
+        //        User userToAdd = _mapper.Map<User>(newUser);
+        //        // userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
+        //        userToAdd.Country = country;
+        //        userToAdd.CountryId = 0;
 
-                UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
+        //        UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
 
-                await repository.SaveDB();
-                return Created($"/users", user);
-            }
-            catch (OperationCanceledException e) {
-                Log.Error(e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e) // TODO: Change Exception type
-            {
-                Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
-            }
-        }
+        //        await repository.SaveDB();
+        //        return Created($"/users", user);
+        //    }
+        //    catch (OperationCanceledException e) {
+        //        Log.Error(e.Message);
+        //        return BadRequest(e.Message);
+        //    }
+        //    catch (Exception e) // TODO: Change Exception type
+        //    {
+        //        Log.Error(e.Message);
+        //        return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
+        //    }
+        //}
 
 
         // TODO: newPassword, countryCode and name should be optional. 
         // PUT users/5
+
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]

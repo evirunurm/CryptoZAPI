@@ -7,7 +7,11 @@ namespace Models.DTO {
         [Required(ErrorMessage = "You should provide a Name value.")]
         [MaxLength(64, ErrorMessage = "The Name shouldn't have more than 64 characters.")]
         public string Name { get; set; } = String.Empty;
-        
+
+        [Required(ErrorMessage = "You should provide a Username value.")]
+        [MaxLength(64, ErrorMessage = "The Username shouldn't have more than 64 characters.")]
+        public string UserName { get; set; } = String.Empty;
+
         [Required(ErrorMessage = "You should provide a Email value.")]
         [MaxLength(320, ErrorMessage = "The Email shouldn't have more than 320 characters.")]
         public string Email { get; set; } = String.Empty;

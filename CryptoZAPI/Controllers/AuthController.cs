@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Models.Roles;
 
 namespace CryptoZAPI.Controllers
 {
@@ -28,17 +29,18 @@ namespace CryptoZAPI.Controllers
         private readonly IRepository<Country> repositoryCountry;
         private readonly IConfiguration configuration;
         private readonly UserManager<User> userManager;
-
-
+        private readonly RoleManager<UserRole> roleManager;
         private readonly IMapper _mapper;
 
-        public AuthController(IRepository<User> repository, IRepository<Country> repositoryCountry, IMapper mapper, IConfiguration configuration, UserManager<User> userManager)
+       
+        public AuthController(IRepository<User> repository, IRepository<Country> repositoryCountry, IMapper mapper, IConfiguration configuration, UserManager<User> userManager, RoleManager<UserRole> roleManager)
         {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this.repositoryCountry = repositoryCountry ?? throw new ArgumentNullException(nameof(repositoryCountry));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager)); 
+            this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            this.roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
         public record AuthenticateRequest(string UserEmail, string Password);
@@ -114,9 +116,75 @@ namespace CryptoZAPI.Controllers
         }
 
 
-        // TODO: newPassword, countryCode and name should be optional. 
-        // PUT users/5
-        [HttpPut]
+        [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> Register([FromBody] UserForCreationDto newUser)
+        {
+
+            try
+            {
+                var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
+
+                /* DUDA PREGUNTAR EN CLASE */
+                if (!foundCountry.Any())
+                {
+                    ModelState.AddModelError("Country", "Please enter a Country Code (2 characters)");
+                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
+                }
+
+                Country country = foundCountry[0];
+
+                var userToAdd = new User
+                {
+                    Email = newUser.Email,
+                    FullName = newUser.Name,
+                    UserName = newUser.UserName,
+                    CountryId = country.Id
+                };
+
+                var createdUser = await userManager.CreateAsync(userToAdd, newUser.Password);
+
+                bool roleExists = await roleManager.RoleExistsAsync("User");
+                if (!roleExists)
+                {
+                    // first we create User role   
+                    var role = new UserRole();
+                    role.Name = "User";
+                    role.Notes = "test";
+                    await roleManager.CreateAsync(role);
+                }
+
+                if (createdUser.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(userToAdd, "User");
+
+                    return Created($"/me", (new
+                    {
+                        Email = userToAdd.Email,
+                        UserName = userToAdd.UserName,
+                    }));
+                }
+                
+                return Conflict(createdUser.Errors);
+            }
+            catch (OperationCanceledException e)
+            {
+                Log.Error(e.Message);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e) // TODO: Change Exception type
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
+            }
+
+            }
+
+
+            // TODO: newPassword, countryCode and name should be optional. 
+            // PUT users/5
+            [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser)
