@@ -10,7 +10,7 @@ namespace Models {
 
         [Required(ErrorMessage = "You should provide a Name value.")]
         [MaxLength(64, ErrorMessage = "The Name shouldn't have more than 64 characters.")]
-        public string Name { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "You should provide a Brithdate value.")]
         public DateTime Birthdate { get; set; } = new DateTime();
@@ -25,7 +25,7 @@ namespace Models {
             if (user == null)
                 throw new ArgumentNullException();
 
-            this.Name = user.Name;
+            this.FullName = user.FullName;
             this.Country = user.Country;
             this.CountryId = user.CountryId;
         }

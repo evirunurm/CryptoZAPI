@@ -28,56 +28,6 @@ var app = builder.Build();
 
 app.Configure();
 
-app.MapPost("/token", async (AuthenticateRequest request, UserManager<User> userManager) => {
-    // Verificamos credenciales con Identity
-    var user = await userManager.FindByNameAsync(request.UserEmail);
-
-    if (user is null || !await userManager.CheckPasswordAsync(user, request.Password)) {
-        return Results.Forbid();
-    }
-
-    var roles = await userManager.GetRolesAsync(user);
-
-    // Generamos un token según los claims
-    var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Email, user.Email),
-    };
-
-    foreach (var role in roles) {
-        claims.Add(new Claim(ClaimTypes.Role, role));
-    }
-
-    var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]));
-    var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-    var tokenDescriptor = new JwtSecurityToken(
-        issuer: builder.Configuration["Jwt:Issuer"],
-        audience: builder.Configuration["Jwt:Audience"],
-        claims: claims,
-        expires: DateTime.Now.AddMinutes(720),
-        signingCredentials: credentials);
-
-    var jwt = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-
-    return Results.Ok(new {
-        AccessToken = jwt
-    });
-});
-
-app.MapGet("/me", (IHttpContextAccessor contextAccessor) => {
-    var user = contextAccessor.HttpContext.User;
-
-    return Results.Ok(new {
-        Claims = user.Claims.Select(s => new {
-            s.Type,
-            s.Value
-        }).ToList(),
-        user.Identity.Name,
-        user.Identity.IsAuthenticated,
-        user.Identity.AuthenticationType
-    });
-})
-.RequireAuthorization();
 
 await SeedData();
 
@@ -99,7 +49,8 @@ async Task SeedData() {
 
     var newUser = new User {        
         Email = "test@demo.com",
-        Name = "Test",
+        FullName = "Test",
+        UserName = "patata",
         CountryId = 1
     };
 
