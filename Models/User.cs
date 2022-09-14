@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 // using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Models.DTO;
 
 namespace Models {
     public class User : IdentityUser<int>
@@ -20,7 +21,7 @@ namespace Models {
         public Country Country { get; set; } = new Country();
         public List<History> Histories { get; set; } = new List<History>();
         public List<UserCurrency> UsersCurrencies { get; set; } = new List<UserCurrency>();
-
+     
         public void UpdateFromUser(User? user) {
             if (user == null)
                 throw new ArgumentNullException();

@@ -34,45 +34,45 @@ app.Run();
 
 
 
-//async Task SeedData() {
-//    var scopeFactory = app!.Services.GetRequiredService<IServiceScopeFactory>();
-//    using var scope = scopeFactory.CreateScope();
+async Task SeedData() {
+    var scopeFactory = app!.Services.GetRequiredService<IServiceScopeFactory>();
+    using var scope = scopeFactory.CreateScope();
 
-//    var context = scope.ServiceProvider.GetRequiredService<CryptoZContext>();
-//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRole>>();
-//    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var context = scope.ServiceProvider.GetRequiredService<CryptoZContext>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRole>>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-//    context.Database.EnsureCreated();
+    context.Database.EnsureCreated();
 
-//    //if (!userManager.Users.Any()) {
-//    logger.LogInformation("Creando usuario de prueba");
+    //if (!userManager.Users.Any()) {
+    logger.LogInformation("Creando usuario de prueba");
 
-//    var newUser = new User {        
-//        Email = "test@demo.com",
-//        FullName = "Test",
-//        UserName = "patata",
-//        CountryId = 1
-//    };
+    var newUser = new User {
+        Email = "test@demo.com",
+        FullName = "Test",
+        UserName = "patata",
+        CountryId = 1
+    };
 
-//    await userManager.CreateAsync(newUser, "P@ss.W0rd");
-//    //await roleManager.CreateAsync(new UserRole {
-//    //    Notes = "Admin"
-//    //});
-//    //await roleManager.CreateAsync(new UserRole {
-//    //    Notes = "AnotherRole"
-//    //});
+    await userManager.CreateAsync(newUser, "P@ss.W0rd");
+    //await roleManager.CreateAsync(new UserRole {
+    //    Notes = "Admin"
+    //});
+    //await roleManager.CreateAsync(new UserRole {
+    //    Notes = "AnotherRole"
+    //});
 
-//    bool x = await roleManager.RoleExistsAsync("Admin");
-//    if (!x) {
-//        // first we create Admin role   
-//        var role = new UserRole();
-//        role.Name = "Admin";
-//        role.Notes = "test";
-//        await roleManager.CreateAsync(role);
-//    }
+    bool x = await roleManager.RoleExistsAsync("Admin");
+    if (!x) {
+        // first we create Admin role   
+        var role = new UserRole();
+        role.Name = "Admin";
+        role.Notes = "test";
+        await roleManager.CreateAsync(role);
+    }
 
-//    await userManager.AddToRoleAsync(newUser, "Admin");
-//    //}
-//}
+    await userManager.AddToRoleAsync(newUser, "Admin");
+    //}
+}
 

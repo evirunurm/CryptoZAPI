@@ -46,6 +46,9 @@ public static class Startup {
 
         builder.Services.AddIdentityCore<User>(options => {
             options.Password.RequiredLength = 8;
+            options.Password.RequireDigit = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
         })
         .AddRoles<UserRole>()
         .AddEntityFrameworkStores<CryptoZContext>();
