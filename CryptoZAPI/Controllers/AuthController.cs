@@ -142,15 +142,19 @@ namespace CryptoZAPI.Controllers {
                     await roleManager.CreateAsync(role);
                 }
 
-                if (!createdUser.Succeeded) {
+
+
+                if (createdUser.Succeeded) {
                     await userManager.AddToRoleAsync(userToAdd, "User");
+                    await this.repository.SaveDB();
+
 
                     return Created($"/me", (new {
                         Email = userToAdd.Email,
                         UserName = userToAdd.UserName,
                     }));
                 }
-                await this.repository.SaveDB();
+                
                 return Conflict(createdUser.Errors);
             }
             catch (OperationCanceledException e) {
