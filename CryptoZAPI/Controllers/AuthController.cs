@@ -88,7 +88,8 @@ namespace CryptoZAPI.Controllers {
             var claims = new List<Claim>
             {
                     new Claim(ClaimTypes.Email, user.Email),
-                };
+                    new Claim("id", user.Id.ToString())
+            };
 
 
             foreach (var role in roles) {
