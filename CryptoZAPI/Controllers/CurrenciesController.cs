@@ -43,6 +43,44 @@ namespace CryptoZAPI.Controllers {
             return Ok(userCurrencies);
         }
 
+
+
+        //public async Task<IActionResult> PostCurrencies([FromBody] UserCurrencyForCreationDto customCurrency)
+        //{
+
+        //    //Buscar si existe 
+        //    var foundCurrency = await repository.FindBy(c => c.Code == customCurrency.CurrencyCode).ToListAsync();
+        //    if (!foundCurrency.Any())
+        //    {
+        //        ModelState.AddModelError("Currency", "Please enter a valid Currency Code");
+        //        return BadRequest(new UnprocessableEntityObjectResult(ModelState));
+        //    }
+        //    Currency currency = foundCurrency[0];
+        //    var foundUserCurrency = await repositoryUserCurrency.FindBy(uc => (uc.CurrencyId == currency.Id) && (uc.UserId == customCurrency.UserId) ).ToListAsync();
+        //    if (!foundUserCurrency.Any())
+        //    {
+        //        //Insertar fila
+        //        UserCurrency custom = new UserCurrency();
+
+        //        custom.CurrencyId = currency.Id;
+        //        custom.UserId = customCurrency.UserId;
+        //        custom.Name = customCurrency.Name;
+
+        //        UserCurrency user = await repositoryUserCurrency.Create(custom);
+
+        //        UserCurrencyForViewDto userCurrencyForViewDto = _mapper.Map<UserCurrencyForViewDto>(user);
+
+        //        await repositoryUserCurrency.SaveDB();
+        //        return Created($"/users/{customCurrency.UserId}", userCurrencyForViewDto);
+        //    }
+        //    UserCurrency userCurrency = foundUserCurrency[0];
+
+
+
+
+        //    return null;
+        //}
+
         // POST custom currencies
         [HttpPost("customCurrencies")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrencyForCreationDto>))]
