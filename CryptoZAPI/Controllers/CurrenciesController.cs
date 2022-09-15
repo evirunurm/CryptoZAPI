@@ -30,6 +30,66 @@ namespace CryptoZAPI.Controllers {
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+
+
+        // GET custom currencies
+        [HttpGet("customCurrencies")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetCustomCurrencies()
+        {
+            List<UserCurrency> userCurrencies = await repositoryUserCurrency.GetAll().ToListAsync();
+            return Ok(userCurrencies);
+        }
+
+        // POST custom currencies
+        [HttpPost("customCurrencies")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrencyForCreationDto>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> PostCustomCurrencies([FromBody] UserCurrencyForCreationDto newCustomCurrency)
+        {
+            try
+            {
+
+                var foundCurrency = await repository.FindBy(c => c.Code == newCustomCurrency.CurrencyCode).ToListAsync();
+
+                /* DUDA PREGUNTAR EN CLASE */
+                if (!foundCurrency.Any())
+                {
+                    ModelState.AddModelError("Currency", "Please enter a valid Currency Code");
+                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
+                }
+
+                Currency currency = foundCurrency[0];
+
+                UserCurrency custom = new UserCurrency(); 
+
+                custom.CurrencyId = currency.Id;
+                custom.UserId = newCustomCurrency.UserId;
+                custom.Name = newCustomCurrency.Name;
+
+                UserCurrency user = await repositoryUserCurrency.Create(custom);
+
+                UserCurrencyForViewDto userCurrencyForViewDto = _mapper.Map<UserCurrencyForViewDto>(user); 
+
+                await repositoryUserCurrency.SaveDB();
+                return Created($"/users/{newCustomCurrency.UserId}", userCurrencyForViewDto);
+            }
+            catch (OperationCanceledException e)
+            {
+                Log.Error(e.Message);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e) // TODO: Change Exception type
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
+            }
+        }
+
+
         // GET currencies
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
@@ -142,9 +202,11 @@ namespace CryptoZAPI.Controllers {
 
         }
 
+        
+
         /* -- CUSTOM CURRENCIES -- */
-        // GET currencies
-        [HttpGet("user/{userId:int}")]
+         //GET currencies
+        [HttpGet("customCurrencies/{userId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
@@ -201,50 +263,7 @@ namespace CryptoZAPI.Controllers {
             // TODO: Add Exceptions
         }
 
-        // POST
-        [HttpPost("user")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CurrencyForViewDto))]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Post([FromBody] UsersCurrenciesDto newCustomCurrency) {
-            try {               
-
-                if (!ModelState.IsValid) {
-                    return new UnprocessableEntityObjectResult(ModelState);
-                }
-
-                var foundCurrency = await repository.FindBy(c => c.Code == newCustomCurrency.CurrencyCode.ToUpper()).ToListAsync();
-
-                /* DUDA PREGUNTAR EN CLASE */
-                if (!foundCurrency.Any()) {
-                    ModelState.AddModelError("Currency", "Please enter a valid Currency Code");
-                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
-                }
-
-                Currency currency = foundCurrency[0];
-
-                UserCurrency custom = new UserCurrency();
-
-                custom.CurrencyId = currency.Id;
-                custom.UserId = newCustomCurrency.UserId;
-                custom.Name = newCustomCurrency.Name;
-
-                CurrencyForViewDto user = _mapper.Map<CurrencyForViewDto>(await repositoryUserCurrency.Create(custom));
-
-                await repositoryUserCurrency.SaveDB();
-                return Created($"/users/{newCustomCurrency.UserId}", user);
-            }
-            catch (OperationCanceledException e) {
-                Log.Error(e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e) // TODO: Change Exception type
-            {
-                Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
-            }
-        }
-
-
+        
         private bool Equals(Currency a, Currency b) {
             return a.Code == b.Code || a.Id == b.Id;
         }
