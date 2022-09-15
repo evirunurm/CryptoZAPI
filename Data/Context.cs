@@ -39,7 +39,10 @@ namespace Models {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserCurrency>()
-                .HasKey(uc => new { uc.UserId, uc.CurrencyId });
+                .HasKey(uc => new { uc.Id });
+
+            modelBuilder.Entity<UserCurrency>()
+                .HasIndex(uc => new { uc.UserId, uc.CurrencyId } );
 
             modelBuilder.Entity<UserCurrency>()
                 .HasOne(uc => uc.User)
