@@ -12,5 +12,6 @@ namespace Models.DTO {
         public double Value { get; set; }
         public double Result { get; set; }
         public DateTime Date { get; set; }
+        public double Factor { get; set; }
     }
 }

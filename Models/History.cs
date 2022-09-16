@@ -15,6 +15,8 @@ namespace CryptoZAPI.Models {
 
         [Required(ErrorMessage = "You should provide a Result value.")]
         public double Result { get; set; }
+
+        public double Factor { get; set; }
         public DateTime Date { get; set; }
 
         // Relations

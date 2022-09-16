@@ -140,6 +140,7 @@ namespace CryptoZAPI.Controllers {
                 historyMapped.Destination = foundListCurrencyDestination[0];
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
                 historyMapped.Date = DateTime.Now.Date;
+                historyMapped.Factor = foundListCurrencyOrigin[0].Price / foundListCurrencyDestination[0].Price;
 
                 HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(historyMapped);
 
@@ -198,6 +199,7 @@ namespace CryptoZAPI.Controllers {
                 historyMapped.Result = Utils.Conversion.Convert(historyMapped.Origin, historyMapped.Destination, historyMapped.Value);
                 historyMapped.UserId = foundUser.Id;
                 historyMapped.Date = DateTime.Now.Date;
+                historyMapped.Factor = foundListCurrencyOrigin[0].Price / foundListCurrencyDestination[0].Price;
 
                 HistoryForViewDto historyDto = _mapper.Map<HistoryForViewDto>(await repository.Create(historyMapped));
                 await repository.SaveDB();
