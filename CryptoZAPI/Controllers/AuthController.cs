@@ -98,7 +98,8 @@ namespace CryptoZAPI.Controllers {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Email),
                     new Claim(ClaimTypes.Email, user.Email),
-                };
+                    new Claim("id", user.Id.ToString())
+            };
 
 
             foreach (var role in roles) {
@@ -152,15 +153,19 @@ namespace CryptoZAPI.Controllers {
                     await roleManager.CreateAsync(role);
                 }
 
-                if (!createdUser.Succeeded) {
+
+
+                if (createdUser.Succeeded) {
                     await userManager.AddToRoleAsync(userToAdd, "User");
+                    await this.repository.SaveDB();
+
 
                     return Created($"/me", (new {
                         Email = userToAdd.Email,
                         UserName = userToAdd.UserName,
                     }));
                 }
-                await this.repository.SaveDB();
+                
                 return Conflict(createdUser.Errors);
             }
             catch (OperationCanceledException e) {

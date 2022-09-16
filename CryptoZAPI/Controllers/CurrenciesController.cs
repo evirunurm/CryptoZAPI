@@ -33,6 +33,78 @@ namespace CryptoZAPI.Controllers {
             this.httpContextAccessor = httpContextAccessor;
         }
 
+
+
+        // GET custom currencies
+        [HttpGet("customCurrencies")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetCustomCurrencies()
+        {
+            List<UserCurrency> userCurrencies = await repositoryUserCurrency.GetAll().ToListAsync();
+            return Ok(userCurrencies);
+        }
+
+
+        // Update custom currencies
+        [HttpPost("updateCustomCurrencies")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> UpdateCustomCurrencies([FromBody] UserCurrencyForCreationDto customCurrency)
+        {
+            try
+            {
+
+            
+                //Buscar si existe 
+                var foundCurrency = await repository.FindBy(c => c.Code == customCurrency.CurrencyCode).ToListAsync();
+                if (!foundCurrency.Any())
+                {
+                    ModelState.AddModelError("Currency", "Please enter a valid Currency Code");
+                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
+                }
+                Currency currency = foundCurrency[0];
+                var foundUserCurrency = await repositoryUserCurrency.FindBy(uc => uc.CurrencyId == currency.Id).ToListAsync();
+                UserCurrency custom = new UserCurrency();
+                if (!foundUserCurrency.Any())
+                {
+                    custom.CurrencyId = currency.Id;
+                    custom.UserId = customCurrency.UserId;
+                    custom.Name = customCurrency.Name;
+
+                    UserCurrency user = await repositoryUserCurrency.Create(custom);
+                    await repositoryUserCurrency.SaveDB();
+                }
+                else
+                {
+                    custom = foundUserCurrency[0];
+                    if (custom.Name != customCurrency.Name)
+                    {
+                        custom.Name = customCurrency.Name;
+                        await repositoryUserCurrency.SaveDB();
+                    }
+                }
+
+                UserCurrencyForViewDto userCurrencyForViewDto = _mapper.Map<UserCurrencyForViewDto>(custom);
+                return Created($"/users/{customCurrency.UserId}", userCurrencyForViewDto);
+            }
+
+            catch (OperationCanceledException e)
+            {
+                Log.Error(e.Message);
+                return BadRequest(e.Message);
+            }
+            catch (Exception e) // TODO: Change Exception type
+            {
+                Log.Error(e.Message);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
+            }
+
+        }
+
+
         // GET currencies
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
@@ -130,9 +202,11 @@ namespace CryptoZAPI.Controllers {
 
         }
 
+        
+
         /* -- CUSTOM CURRENCIES -- */
-        // GET currencies
-        [HttpGet("user/{userId:int}")]
+         //GET currencies
+        [HttpGet("customCurrencies/{userId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
@@ -190,8 +264,9 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
             // TODO: Add Exceptions
-        }     
+        }
 
+        
         private bool Equals(Currency a, Currency b) {
             return a.Code == b.Code || a.Id == b.Id;
         }      

@@ -51,6 +51,7 @@ public static class Startup {
             options.Password.RequireDigit = false;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
         })
         .AddRoles<UserRole>()
         .AddEntityFrameworkStores<CryptoZContext>();
