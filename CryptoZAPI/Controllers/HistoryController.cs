@@ -48,7 +48,6 @@ namespace CryptoZAPI.Controllers {
                     return Unauthorized();
                 }
 
-
                 var foundUser = new User(); // await repositoryUser.GetById(userId);
 
                 if (foundUser != null) {
@@ -156,7 +155,7 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
         }
-    
+
         // POST
         [HttpPost("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HistoryForViewDto))]
@@ -167,7 +166,7 @@ namespace CryptoZAPI.Controllers {
             try {
                 //[Authorize]
 
-                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);             
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
 
                 if (tokenUserId != userId) {
                     return Unauthorized();
@@ -182,7 +181,7 @@ namespace CryptoZAPI.Controllers {
                 var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode.ToUpper()).ToListAsync();
                 var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode.ToUpper()).ToListAsync();
                 var foundUser = await repositoryUser.GetById(userId);
-      
+
                 if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any()) {
                     Log.Warning("A currency was not found");
                     return NotFound();

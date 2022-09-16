@@ -40,8 +40,8 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> GetCustomCurrencies()
-        {
+        [Authorize]
+        public async Task<IActionResult> GetCustomCurrencies() {
             List<UserCurrency> userCurrencies = await repositoryUserCurrency.GetAll().ToListAsync();
             return Ok(userCurrencies);
         }
@@ -52,24 +52,26 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> UpdateCustomCurrencies([FromBody] UserCurrencyForCreationDto customCurrency)
-        {
-            try
-            {
+        [Authorize]
+        public async Task<IActionResult> UpdateCustomCurrencies(int userId, [FromBody] UserCurrencyForCreationDto customCurrency) {
+            try {
 
-            
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
+
+                if (tokenUserId != userId) {
+                    return Unauthorized();
+                }
+
                 //Buscar si existe 
                 var foundCurrency = await repository.FindBy(c => c.Code == customCurrency.CurrencyCode).ToListAsync();
-                if (!foundCurrency.Any())
-                {
+                if (!foundCurrency.Any()) {
                     ModelState.AddModelError("Currency", "Please enter a valid Currency Code");
                     return BadRequest(new UnprocessableEntityObjectResult(ModelState));
                 }
                 Currency currency = foundCurrency[0];
-                var foundUserCurrency = await repositoryUserCurrency.FindBy(uc => uc.CurrencyId == currency.Id).ToListAsync();
+                var foundUserCurrency = await repositoryUserCurrency.FindBy((uc => ((uc.CurrencyId == currency.Id) && (uc.UserId == userId)))).ToListAsync();
                 UserCurrency custom = new UserCurrency();
-                if (!foundUserCurrency.Any())
-                {
+                if (!foundUserCurrency.Any()) {
                     custom.CurrencyId = currency.Id;
                     custom.UserId = customCurrency.UserId;
                     custom.Name = customCurrency.Name;
@@ -77,11 +79,9 @@ namespace CryptoZAPI.Controllers {
                     UserCurrency user = await repositoryUserCurrency.Create(custom);
                     await repositoryUserCurrency.SaveDB();
                 }
-                else
-                {
+                else {
                     custom = foundUserCurrency[0];
-                    if (custom.Name != customCurrency.Name)
-                    {
+                    if (custom.Name != customCurrency.Name) {
                         custom.Name = customCurrency.Name;
                         await repositoryUserCurrency.SaveDB();
                     }
@@ -91,8 +91,7 @@ namespace CryptoZAPI.Controllers {
                 return Created($"/users/{customCurrency.UserId}", userCurrencyForViewDto);
             }
 
-            catch (OperationCanceledException e)
-            {
+            catch (OperationCanceledException e) {
                 Log.Error(e.Message);
                 return BadRequest(e.Message);
             }
@@ -111,7 +110,7 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll(int limit = int.MaxValue, int offset = 0, string? filter = "") {
-            
+
             try {
                 filter = filter ?? "";
 
@@ -186,9 +185,7 @@ namespace CryptoZAPI.Controllers {
                     Log.Warning("Item not found");
                     return NotFound();
                 }
-
                 CurrencyForViewDto currency = _mapper.Map<CurrencyForViewDto>(filtered[0]); // MAPPING FROM Currency TO CurrencyForViewDto 
-
                 return Ok(currency);
             }
             catch (KeyNotFoundException e) {
@@ -199,13 +196,11 @@ namespace CryptoZAPI.Controllers {
                 Log.Error(e.Message);
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, e.Message);
             }
-
         }
 
-        
 
         /* -- CUSTOM CURRENCIES -- */
-         //GET currencies
+        //GET currencies
         [HttpGet("customCurrencies/{userId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -266,9 +261,8 @@ namespace CryptoZAPI.Controllers {
             // TODO: Add Exceptions
         }
 
-        
         private bool Equals(Currency a, Currency b) {
             return a.Code == b.Code || a.Id == b.Id;
-        }      
+        }
     }
 }

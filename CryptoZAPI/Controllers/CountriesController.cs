@@ -14,15 +14,11 @@ namespace CryptoZAPI.Controllers {
     [ApiController]
     public class CountriesController : ControllerBase {
 
-
         private readonly IRestCountries restCountries;
         private readonly IRepository<Country> repository;
 
         // Mapper
         private readonly IMapper _mapper;
-
-
-
 
         public CountriesController(IRestCountries restCountries, IRepository<Country> repository, IMapper mapper) {
             this.restCountries = restCountries ?? throw new ArgumentNullException(nameof(restCountries));

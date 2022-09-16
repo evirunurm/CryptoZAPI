@@ -165,7 +165,7 @@ namespace CryptoZAPI.Controllers {
                         UserName = userToAdd.UserName,
                     }));
                 }
-                
+
                 return Conflict(createdUser.Errors);
             }
             catch (OperationCanceledException e) {
