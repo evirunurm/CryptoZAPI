@@ -54,11 +54,14 @@ namespace CryptoZAPI.Controllers {
                     Log.Warning("User not found");
                     NotFound();
                 }
-                List<History> history = await repository.FindBy(h => h.UserId == userId)
-                    .OrderByDescending(h => h.Date)
+                IQueryable<History> historyRaw = repository.FindBy(h => h.UserId == userId)
+                    .OrderByDescending(h => h.Id);
+
+                List<History> history = await historyRaw
                     .Skip(offset)
                     .Take(limit)
                     .ToListAsync();
+
 
                 foreach (History h in history) {
                     var foundDestination = await repositoryCurrency.GetById(h.DestinationId);
