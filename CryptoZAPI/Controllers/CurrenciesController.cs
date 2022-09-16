@@ -73,7 +73,7 @@ namespace CryptoZAPI.Controllers {
                 UserCurrency custom = new UserCurrency();
                 if (!foundUserCurrency.Any()) {
                     custom.CurrencyId = currency.Id;
-                    custom.UserId = customCurrency.UserId;
+                    custom.UserId = userId;
                     custom.Name = customCurrency.Name;
 
                     UserCurrency user = await repositoryUserCurrency.Create(custom);
@@ -88,7 +88,7 @@ namespace CryptoZAPI.Controllers {
                 }
 
                 UserCurrencyForViewDto userCurrencyForViewDto = _mapper.Map<UserCurrencyForViewDto>(custom);
-                return Created($"/users/{customCurrency.UserId}", userCurrencyForViewDto);
+                return Created($"/users/{userId}", userCurrencyForViewDto);
             }
 
             catch (OperationCanceledException e) {
