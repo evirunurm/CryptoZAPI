@@ -1,7 +1,9 @@
 ﻿using CryptoZAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Roles;
 // using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -9,8 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data {
-    public class CryptoZContext : DbContext {
+namespace Models {
+    public class CryptoZContext : IdentityDbContext<User, UserRole, int> {
         public DbSet<Currency> Currencies => Set<Currency>();
         public DbSet<History> Histories => Set<History>();
         public DbSet<User> Users => Set<User>();
@@ -20,15 +22,27 @@ namespace Data {
         // DB Path
         private string DbPath = $"DB\\SQLite.DB";
 
+        public CryptoZContext() : base() {
+
+        }
+
+        public CryptoZContext(DbContextOptions<CryptoZContext> optionsBuilder) : base(optionsBuilder) {
+
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             //optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CryptoZdb;Trusted_Connection=True;MultipleActiveResultSets=true");
             optionsBuilder.UseSqlite($"Data Source={DbPath}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<UserCurrency>()
-                .HasKey(uc => new { uc.UserId, uc.CurrencyId });
+                .HasKey(uc => new { uc.Id });
+
+            modelBuilder.Entity<UserCurrency>()
+                .HasIndex(uc => new { uc.UserId, uc.CurrencyId } ).IsUnique();
 
             modelBuilder.Entity<UserCurrency>()
                 .HasOne(uc => uc.User)

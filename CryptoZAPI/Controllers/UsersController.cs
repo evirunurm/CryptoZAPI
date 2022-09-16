@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using RestCountriesServices;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace CryptoZAPI.Controllers {
     [Route("users")]
@@ -17,81 +19,44 @@ namespace CryptoZAPI.Controllers {
 
         private readonly IRepository<User> repository;
         private readonly IRepository<Country> repositoryCountry;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
 
         private readonly IMapper _mapper;
 
-        public UsersController(IRepository<User> repository, IRepository<Country> repositoryCountry, IMapper mapper) {
+        public UsersController(IRepository<User> repository, IRepository<Country> repositoryCountry, IMapper mapper, IHttpContextAccessor httpContextAccessor) {
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this.repositoryCountry = repositoryCountry ?? throw new ArgumentNullException(nameof(repositoryCountry));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.httpContextAccessor = httpContextAccessor;
         }
 
-        // POST users
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(UserForViewDto))]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Post([FromBody] UserForCreationDto newUser) {
-            try {
+        public record AuthenticateRequest(string UserEmail, string Password);
 
-                if (!Regex.Match(newUser.Email, @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$").Success)
-                    ModelState.AddModelError("Email", "Please enter a valid email");               
-
-                if (!ModelState.IsValid) {
-                    return new UnprocessableEntityObjectResult(ModelState);
-                }
-
-                var foundCountry = await repositoryCountry.FindBy(c => c.CountryCode == newUser.CountryCode.ToUpper()).ToListAsync();
-
-                /* DUDA PREGUNTAR EN CLASE */
-                if (!foundCountry.Any()) {
-                    ModelState.AddModelError("Country", "Please enter a Country Code (2 characters)");
-                    return BadRequest(new UnprocessableEntityObjectResult(ModelState));
-                }
-
-                Country country = foundCountry[0];
-
-                User userToAdd = _mapper.Map<User>(newUser);
-                userToAdd.Password = BCrypt.Net.BCrypt.HashPassword(userToAdd.Password);
-                userToAdd.Country = country;
-                userToAdd.CountryId = 0;
-
-                UserForViewDto user = _mapper.Map<UserForViewDto>(await repository.Create(userToAdd));
-
-                await repository.SaveDB();
-                return Created($"/users", user);
-            }
-            catch (OperationCanceledException e) {
-                Log.Error(e.Message);
-                return BadRequest(e.Message);
-            }
-            catch (Exception e) // TODO: Change Exception type
-            {
-                Log.Error(e.Message);
-                return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed");
-            }
-        }
-
-
-        // TODO: newPassword, countryCode and name should be optional. 
-        // PUT users/5
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserForViewDto))]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> Put(int id, [FromBody] UserForUpdateDto updateUser) {
+        [Authorize]
+        public async Task<IActionResult> Put(int userId, [FromBody] UserForUpdateDto updateUser) {
             try {
+
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
+
+                if (tokenUserId != userId) {
+                    return Unauthorized();
+                }
 
                 if (!ModelState.IsValid) {
                     // return 422 - Unprocessable Entity when validation fails
                     return new UnprocessableEntityObjectResult(ModelState);
                 }
 
-                List<User> foundUsers = await repository.FindBy(u => u.Id == id).ToListAsync();
+                List<User> foundUsers = await repository.FindBy(u => u.Id == userId).ToListAsync();
 
                 if (!foundUsers.Any()) {
                     return BadRequest();
                 }
-             
+
                 List<Country> foundCountry = await repositoryCountry.FindBy(u => u.CountryCode == updateUser.CountryCode).ToListAsync();
 
                 if (!foundCountry.Any()) {
@@ -116,7 +81,7 @@ namespace CryptoZAPI.Controllers {
             }
 
             catch (KeyNotFoundException e) {
-                Log.Warning("No content found: "+e.Message);
+                Log.Warning("No content found: " + e.Message);
                 return NotFound();
             }
             catch (Exception e) // TODO: Change Exception type

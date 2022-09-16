@@ -7,12 +7,16 @@ using System.Text;
 
 namespace CryptoZAPI.Models {
     public class UserCurrency {
+
+
+        [Key]
+        public int Id { get; set; }
         public int UserId { get; set; }
         public int CurrencyId { get; set; }
         public string Name { get; set; } = String.Empty;
 
-        public User User { get; set; } = new User();
-        public Currency Currency { get; set; } = new Currency();
+        public User User { get; set; }// = new User();
+        public Currency Currency { get; set; } //= new Currency();
 
 
 

@@ -9,14 +9,20 @@ using System.Threading.Tasks;
 
 namespace Models.Mappers {
     public class UserProfile : Profile {
-        public UserProfile () {
+        public UserProfile() {
 
             // <Origen, Destino>
 
             /* CreationDTO */
             CreateMap<UserForCreationDto, User>()
                 .ForMember(dest => dest.Id,
-                            opt => opt.Ignore())            
+                            opt => opt.Ignore())
+                .ForMember(dest => dest.FullName,
+                            opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.UserName,
+                            opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.FullName,
+                            opt => opt.MapFrom(src => src.Name))
                 .ReverseMap();
 
             /* ViewDTO */
@@ -27,6 +33,8 @@ namespace Models.Mappers {
             CreateMap<User, UserForViewDto>()
                 .ForMember(dest => dest.CountryCode,
                             opt => opt.MapFrom(src => src.Country.CountryCode))
+                .ForMember(dest => dest.Name,
+                            opt => opt.MapFrom(src => src.FullName))
                 .ForMember(dest => dest.CountryName,
                             opt => opt.MapFrom(src => src.Country.Name));
 
@@ -34,6 +42,8 @@ namespace Models.Mappers {
             CreateMap<UserForUpdateDto, User>()
                 .ForMember(dest => dest.Id,
                             opt => opt.Ignore())
+                  .ForMember(dest => dest.FullName,
+                            opt => opt.MapFrom(src => src.Name))
                 .ReverseMap();
         }
     }

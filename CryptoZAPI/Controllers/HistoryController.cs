@@ -8,6 +8,8 @@ using Repo;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CryptoZAPI.Controllers {
     [Route("history")]
@@ -18,12 +20,15 @@ namespace CryptoZAPI.Controllers {
         private readonly IRepository<Currency> repositoryCurrency;
         private readonly IRepository<History> repository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public HistoryController(IRepository<History> repository, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
+        public HistoryController(IRepository<History> repository, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper,
+            IHttpContextAccessor httpContextAccessor) {
             this.repositoryUser = repositoryUser ?? throw new ArgumentNullException(nameof(repositoryUser));
             this.repositoryCurrency = repositoryCurrency;
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         // GET
@@ -31,22 +36,32 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HistoryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [Authorize]
         public async Task<IActionResult> GetAll(int userId, int limit = int.MaxValue, int offset = 0) {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
 
             try {
 
-                var foundUser = await repositoryUser.GetById(userId);
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
+
+                if (tokenUserId != userId) {
+                    return Unauthorized();
+                }
+
+                var foundUser = new User(); // await repositoryUser.GetById(userId);
 
                 if (foundUser != null) {
                     Log.Warning("User not found");
                     NotFound();
                 }
-                List<History> history = await repository.FindBy(h => h.UserId == userId)
-                    .OrderByDescending(h => h.Date)
+                IQueryable<History> historyRaw = repository.FindBy(h => h.UserId == userId)
+                    .OrderByDescending(h => h.Id);
+
+                List<History> history = await historyRaw
                     .Skip(offset)
                     .Take(limit)
                     .ToListAsync();
+
 
                 foreach (History h in history) {
                     var foundDestination = await repositoryCurrency.GetById(h.DestinationId);
@@ -144,14 +159,21 @@ namespace CryptoZAPI.Controllers {
             }
         }
 
-
         // POST
         [HttpPost("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HistoryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [Authorize]
         public async Task<IActionResult> Post(int userId, [FromBody] HistoryForCreationDto history) {
             try {
+                //[Authorize]
+
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
+
+                if (tokenUserId != userId) {
+                    return Unauthorized();
+                }
 
                 if (!ModelState.IsValid) {
                     return new UnprocessableEntityObjectResult(ModelState);
@@ -162,7 +184,7 @@ namespace CryptoZAPI.Controllers {
                 var foundListCurrencyOrigin = await repositoryCurrency.FindBy(c => c.Code == history.OriginCode.ToUpper()).ToListAsync();
                 var foundListCurrencyDestination = await repositoryCurrency.FindBy(c => c.Code == history.DestinationCode.ToUpper()).ToListAsync();
                 var foundUser = await repositoryUser.GetById(userId);
-      
+
                 if (!foundListCurrencyOrigin.Any() || !foundListCurrencyDestination.Any()) {
                     Log.Warning("A currency was not found");
                     return NotFound();
