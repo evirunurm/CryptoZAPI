@@ -119,6 +119,7 @@ namespace CryptoZAPI.Controllers {
                 expires: DateTime.Now.AddMinutes(720),
                 signingCredentials: credentials);
 
+            
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
 

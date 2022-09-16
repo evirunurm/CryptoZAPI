@@ -48,12 +48,13 @@ namespace CryptoZAPI.Controllers {
                     return Unauthorized();
                 }
 
-                var foundUser = new User(); // await repositoryUser.GetById(userId);
+                var foundUser = await repositoryUser.GetById(userId);
 
-                if (foundUser != null) {
+                if (foundUser == null) {
                     Log.Warning("User not found");
                     NotFound();
                 }
+
                 IQueryable<History> historyRaw = repository.FindBy(h => h.UserId == userId)
                     .OrderByDescending(h => h.Id);
 
@@ -167,7 +168,7 @@ namespace CryptoZAPI.Controllers {
         [Authorize]
         public async Task<IActionResult> Post(int userId, [FromBody] HistoryForCreationDto history) {
             try {
-                //[Authorize]
+                
 
                 var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
 
