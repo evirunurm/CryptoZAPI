@@ -37,7 +37,7 @@ namespace CryptoZAPI.Controllers {
 
         // GET custom currencies
         [HttpGet("customCurrencies")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserCurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         [Authorize]
@@ -49,7 +49,7 @@ namespace CryptoZAPI.Controllers {
 
         // Update custom currencies
         [HttpPost("updateCustomCurrencies")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserCurrency>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserCurrencyForViewDto))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         [Authorize]
@@ -106,7 +106,7 @@ namespace CryptoZAPI.Controllers {
 
         // GET currencies
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetAll(int limit = int.MaxValue, int offset = 0, string? filter = "") {
@@ -202,7 +202,7 @@ namespace CryptoZAPI.Controllers {
         /* -- CUSTOM CURRENCIES -- */
         //GET currencies
         [HttpGet("customCurrencies/{userId:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CurrencyForViewDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CurrencyForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         [Authorize]

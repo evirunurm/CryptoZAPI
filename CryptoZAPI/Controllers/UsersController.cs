@@ -51,7 +51,7 @@ namespace CryptoZAPI.Controllers {
                     return new UnprocessableEntityObjectResult(ModelState);
                 }
 
-                List<User> foundUsers = await repository.FindBy(u => u.Id == id).ToListAsync();
+                List<User> foundUsers = await repository.FindBy(u => u.Id == userId).ToListAsync();
 
                 if (!foundUsers.Any()) {
                     return BadRequest();
