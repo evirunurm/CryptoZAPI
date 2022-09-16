@@ -13,6 +13,9 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Models.Roles;
+using Quartz.Impl;
+using Quartz;
+using BackgroundTasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +32,6 @@ var app = builder.Build();
 app.Configure();
 
 // await SeedData();
-
 app.Run();
 
 

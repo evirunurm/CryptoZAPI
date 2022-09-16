@@ -23,6 +23,14 @@ namespace CryptoZAPI.Controllers {
     [ApiController]
     public class AuthController : ControllerBase {
 
+        public static int CheckAuthorizatedUser(ClaimsPrincipal? claims, string? claim) {
+            if (claims == null || claim == null || claim == "") {
+                throw new ArgumentNullException();
+            }
+            return Int32.Parse(claims.FindFirst(claim).Value);
+        }
+
+
         private readonly IRepository<User> repository;
         private readonly IRepository<Country> repositoryCountry;
         private readonly IConfiguration configuration;
@@ -87,6 +95,8 @@ namespace CryptoZAPI.Controllers {
             // Generamos un token según los claims
             var claims = new List<Claim>
             {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Email),
                     new Claim(ClaimTypes.Email, user.Email),
                 };
 

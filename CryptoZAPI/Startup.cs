@@ -12,9 +12,13 @@ using Repo;
 using RestCountriesServices;
 using System.Text;
 using Microsoft.IdentityModel.Logging;
+using Quartz;
+using Quartz.Spi;
+using Quartz.Simpl;
+using BackgroundTasks;
 
 public static class Startup {
-
+    [Obsolete]
     public static void ConfigureServices(this WebApplicationBuilder builder) {
 
         builder.Services
@@ -33,9 +37,7 @@ public static class Startup {
           };
       });
 
-
         // AutoMapper
-        //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddAutoMapper(typeof(CurrencyProfile), typeof(HistoryProfile), typeof(UserProfile), typeof(CountryProfile));
 
         // DB Path
@@ -52,9 +54,6 @@ public static class Startup {
         })
         .AddRoles<UserRole>()
         .AddEntityFrameworkStores<CryptoZContext>();
-
-      
-
 
         // Controllers
         builder.Services.AddControllers()
@@ -111,8 +110,6 @@ public static class Startup {
         // CORS
         builder.Services.AddCors();
 
-
-
         // Nomics
         builder.Services.AddHttpClient<INomics, Nomics>(client => {
             client.BaseAddress = new Uri("https://api.nomics.com/v1/");
@@ -121,6 +118,43 @@ public static class Startup {
         // RestCountries
         builder.Services.AddHttpClient<IRestCountries, RestCountries>(client => {
             client.BaseAddress = new Uri("https://restcountries.com/v2/");
+        });
+
+        builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        /* Tarea Programada */
+        builder.Services.AddTransient<UpdateCurrencies>();
+        builder.Services.AddTransient<UpdateCountries>();
+        builder.Services.AddSingleton<ITypeLoadHelper, SimpleTypeLoadHelper>();
+
+        var jobCurrenciesKey = new JobKey("UpdateCurrencies");
+        var jobCountriesKey = new JobKey("UpdateCountries");
+        builder.Services.AddQuartz(q => {
+            q.UseMicrosoftDependencyInjectionScopedJobFactory();
+
+            q.AddJob<UpdateCurrencies>(j => j.WithIdentity(jobCurrenciesKey));
+            q.AddTrigger(t => t
+               .WithIdentity("UpdateCurrenciesTrigger")
+               .ForJob(jobCurrenciesKey)
+               .StartNow()
+               .WithSimpleSchedule(x => x
+                    .WithIntervalInHours(24)
+                    .RepeatForever())
+                );
+
+            q.AddJob<UpdateCountries>(j => j.WithIdentity(jobCountriesKey));
+            q.AddTrigger(t => t
+               .WithIdentity("UpdateCountriesTrigger")
+               .ForJob(jobCountriesKey)
+               .StartNow()
+               .WithSimpleSchedule(x => x
+                    .WithIntervalInHours(24)
+                    .RepeatForever())
+                );
+        });
+
+        builder.Services.AddQuartzServer(options => {
+            options.WaitForJobsToComplete = true;
         });
     }
 
@@ -138,7 +172,6 @@ public static class Startup {
                     await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
                 });
             });
-
         }
 
         // Shows UseCors with CorsPolicyBuilder.

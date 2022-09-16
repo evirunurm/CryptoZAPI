@@ -8,6 +8,8 @@ using Repo;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CryptoZAPI.Controllers {
     [Route("history")]
@@ -18,12 +20,15 @@ namespace CryptoZAPI.Controllers {
         private readonly IRepository<Currency> repositoryCurrency;
         private readonly IRepository<History> repository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public HistoryController(IRepository<History> repository, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper) {
+        public HistoryController(IRepository<History> repository, IRepository<User> repositoryUser, IRepository<Currency> repositoryCurrency, IMapper mapper,
+            IHttpContextAccessor httpContextAccessor) {
             this.repositoryUser = repositoryUser ?? throw new ArgumentNullException(nameof(repositoryUser));
             this.repositoryCurrency = repositoryCurrency;
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         // GET
@@ -31,10 +36,18 @@ namespace CryptoZAPI.Controllers {
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<HistoryForViewDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [Authorize]
         public async Task<IActionResult> GetAll(int userId, int limit = int.MaxValue, int offset = 0) {
             // Get all history where idUser == idUser, with limit limit, ordenador por fecha desc
 
             try {
+
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);
+
+                if (tokenUserId != userId) {
+                    return Unauthorized();
+                }
+
 
                 var foundUser = new User(); // await repositoryUser.GetById(userId);
 
@@ -143,15 +156,22 @@ namespace CryptoZAPI.Controllers {
                 return StatusCode(StatusCodes.Status503ServiceUnavailable, "Database couldn't be accessed"); ;
             }
         }
-
-
+    
         // POST
         [HttpPost("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(HistoryForViewDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [Authorize]
         public async Task<IActionResult> Post(int userId, [FromBody] HistoryForCreationDto history) {
             try {
+                //[Authorize]
+
+                var tokenUserId = AuthController.CheckAuthorizatedUser(httpContextAccessor.HttpContext.User, ClaimTypes.NameIdentifier);             
+
+                if (tokenUserId != userId) {
+                    return Unauthorized();
+                }
 
                 if (!ModelState.IsValid) {
                     return new UnprocessableEntityObjectResult(ModelState);

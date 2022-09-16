@@ -16,18 +16,14 @@ namespace RestCountriesServices {
             this.configuration = configuration;
         }
 
-        public async Task<List<CountryForCreationDto>> getCountries() {
-            if (DateTime.Parse(this.configuration["LastUpdatesAPI:restCountries"]) >= DateTime.Now.Date) {
-                throw new Exception(); // TODO: Not neecsary to update
-            }
-
+        public async Task<List<CountryForCreationDto>> getCountries() {  
             this.configuration["LastUpdatesAPI:restCountries"] = DateTime.Now.Date.ToString();
 
             var result = await client.GetAsync($"all");
             var info = await result.Content.ReadAsStringAsync();
 
             List<CountryForCreationDto> countries = JsonConvert.DeserializeObject<List<CountryForCreationDto>>(info) ??
-                 throw new Exception(); // TODO: Json Excpetion
+                 new List<CountryForCreationDto>();
 
             return countries;
         }

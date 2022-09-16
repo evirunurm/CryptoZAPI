@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Models;
 
-
-namespace Models {
+namespace CryptoZAPI.Models {
     public class Country {
         [Key]
         public int Id { get; set; }
@@ -19,6 +19,11 @@ namespace Models {
         //Relations
         public List<User> Users { get; set; } = new List<User>();
 
+        public void UpdateFromCountry(Country? country) {
+            if (country == null)
+                throw new ArgumentNullException();
 
+            this.Name = country.Name;          
+        }
     }
 }

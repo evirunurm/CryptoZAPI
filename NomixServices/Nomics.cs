@@ -18,11 +18,7 @@ namespace NomixServices {
             this.configuration = configuration;
         }
 
-        public async Task<List<CurrencyForCreationDto>> getCurrencies() {
-            if (DateTime.Parse(this.configuration["LastUpdatesAPI:nomics"]) >= DateTime.Now.Date) {
-                throw new Exception(); // TODO: Not necesary to update
-            }
-
+        public async Task<List<CurrencyForCreationDto>> getCurrencies() {         
             this.configuration["LastUpdatesAPI:nomics"] = DateTime.Now.Date.ToString();
 
             string apiKey = configuration["environmentVariables:ApiKey"];
@@ -31,7 +27,7 @@ namespace NomixServices {
             var info = await result.Content.ReadAsStringAsync();
 
             List<CurrencyForCreationDto> currencies = JsonConvert.DeserializeObject<List<CurrencyForCreationDto>>(info) ??
-                throw new Exception(); // TODO: Json Excpetion
+                new List<CurrencyForCreationDto>(); 
 
             return currencies;
         }
